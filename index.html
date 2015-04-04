@@ -36,7 +36,6 @@ function move(frame) {
             filterGesture("keyTap", dropPin)(frame, gesture);
             filterGesture("screenTap", removeAllPins)(frame, gesture);
             filterGesture("swipe", switchMode)(frame, gesture);
-            filterGesture("screenTap", deleteAllPins)(frame, gesture);
         });
     }
     markHands(frame);
@@ -169,6 +168,7 @@ function calcRoute() {
       directionsDisplay.setDirections(response);
     }
   });
+  directionsDisplay.setMap(map);
 }
 
 function dropPin(frame, keyTapGesture){
@@ -218,7 +218,7 @@ function clearMarkers(){
 }
 
 function removeAllPins(frame, screenTapGesture){
-	alert("Remove Pins");
+	//alert("Remove Pins");
   	/*var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
   	var bounds = map.getBounds();
   	if(!bounds) { return; }
@@ -227,16 +227,21 @@ function removeAllPins(frame, screenTapGesture){
   	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));*/
   	clearMarkers();
   	markers = [];
+    start=null;
+    end=null;
+    pins=0;
+    directionsDisplay.setMap();
 }
-
+/*
 function deleteAllPins(frame, gesture){
-  alert("POKE");
+  //alert("POKE");
   for (var i = 0; i < markers.length; i++) {
     markers[i].setMap(null);
   }
   markers = [];
-v
+
 }
+*/
 
 function switchMode(frame, swipeGesture){
 
@@ -296,8 +301,7 @@ function zoom(frame, circleGesture) {
     }
 }
 function initialize() {
-  directionsDisplay = new google.maps.DirectionsRenderer();
-
+  directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
   var mapOptions = {
     zoom: 15,
     center: new google.maps.LatLng(34.0737354, -118.4455506),
