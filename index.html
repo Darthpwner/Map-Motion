@@ -42,6 +42,17 @@ function palmPosition(hand) {
 }
 
 function move(frame) {
+    
+    var planorama;
+    
+        
+    // This is to catch a bug somewhere that causes the StreetView to not be visible
+    panorama = map.getStreetView();
+    if (panorama.getVisible() === false && streetView === true) {
+        panorma.setVisible(true);
+        console.log("Bug avoided");
+        return;
+    }
        
     if (streetView === false && frame.id > streetViewFrameStart + 50) {
         // Look for any circle gestures and process the zoom
@@ -65,7 +76,7 @@ function move(frame) {
                 if(!bounds) { return; }
                 var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
                 var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
-                var panorama = map.getStreetView();
+                panorama = map.getStreetView();
                 map.set('streetViewControl', true);
                 panorama.setPosition(myLatlng);
                 panorama.setVisible(true);
@@ -139,12 +150,12 @@ function move(frame) {
         }
     }
     
-    else {
+    else if (streetView === true) {
         // Two palms down to exit StreetView and return to map.
         if (frame.hands.length === 2 && streetView === true) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
                 map.set('streetViewControl', false);
-                var panorama = map.getStreetView();
+                panorama = map.getStreetView();
                 panorama.setVisible(false);
                 streetView = false;
                 return;
@@ -158,6 +169,9 @@ function move(frame) {
             return;
         }
     }
+
+
+  
 }
 var handMarkers = [];
 var HEIGHT_OFFSET = 150;
@@ -351,10 +365,11 @@ function streetViewSwipe(frame, swipeGesture) {
   
   var panorama = map.getStreetView(); 
   var pov = panorama.getPov();
-  var pano;
+  var panoNum;
+  var pano0;
+  var pano1;
   var links;
-  var FORWARD = 1;
-  var BACKWARD = 0;
+  var direction;
         
   if(swipeDirection=="right"){
     panorama.setPov({
@@ -372,17 +387,43 @@ function streetViewSwipe(frame, swipeGesture) {
     console.log(pov.heading);
   }else if(swipeDirection=="up"){
     links = panorama.getLinks();
-    if (links) {
-        pano = links[FORWARD]['pano'];
-        panorama.setPano(pano);
+    if (links !== undefined) {
+        if (links.length > 1) {
+            pano0 = Math.abs(links[0]['heading'] - pov.heading);
+            pano1 = Math.abs(links[1]['heading'] - pov.heading);
+            if (pano0 < pano1) {
+                panoNum = 0;
+            }
+            else {
+                panoNum = 1;
+            }
+            panorama.setPano(links[panoNum]['pano']);
+        }
+        else {
+            panorama.setpano(links[0]['pano']);
+        }
         console.log('forward');
+        console.log(links);
     }
   }else if(swipeDirection=="down"){
     links = panorama.getLinks();
-    if (links) {
-        pano = links[BACKWARD]['pano'];
-        panorama.setPano(pano);
+    if (links !== undefined) {
+        if (links.length > 1) {
+            pano0 = Math.abs(links[0]['heading'] - pov.heading);
+            pano1 = Math.abs(links[1]['heading'] - pov.heading);
+            if (pano0 < pano1 ) {
+                panoNum = 1;
+            }
+            else {
+                panoNum = 0;
+            }
+            panorama.setPano(links[panoNum]['pano']);
+        }
+        else {
+            panorama.setpano(links[0]['pano']);
+        }
         console.log('back');
+        console.log(links);
     }
   }
 }
