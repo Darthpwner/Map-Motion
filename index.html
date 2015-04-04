@@ -5,12 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <link rel="shortcut icon" href="../favicon.ico">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 
     <style>
       html, body, #map-canvas {
         margin: 0;
+        font-family: 'Open Sans', sans-serif;
         padding: 0;
         height: 95%;
+      }
+
+      h2{
+
+        padding-left: 15px;
       }
 
       #results {
@@ -35,8 +42,6 @@
         list-style-type: none;
         padding: 0;
         margin: 0;
-        height: 321px;
-        width: 200px;
         overflow-y: scroll;
       }
       li {
@@ -616,7 +621,7 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
   map.setTilt(45);
-
+  /*
   var request = {
     location: myOrigin,
     radius: 500,
@@ -627,6 +632,10 @@ function initialize() {
   infowindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
   service.nearbySearch(request, callback);
+  */
+  placesList = document.getElementById('places');
+  infowindow = new google.maps.InfoWindow();
+  service = new google.maps.places.PlacesService(map);
   //showNearByPOI();
   directionsDisplay.setMap(map);
   // listen to Leap Motion
@@ -684,6 +693,40 @@ google.maps.event.addDomListener(window, 'load');
          <input type="submit" value="Search" />
         </form>
         <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
-        <p>Here we are</p>
+        <div>
+          <ul>
+
+            <h2>Basic Movement</h2>
+            <li>Grab the map with one hand to pan around.</li>
+            <li>Draw a clockwise circle with your index finger to zoom in.</li>
+            <li>Draw a counter-clockwise circle with your index finger to zoom out.</li>
+            <li>&nbsp;</li>
+
+            <h2>Streetview</h2>
+
+            <li>Palm up to enter streetview whereever your focus is.</li>
+            <li>Swipe up and down to go forward and backwards, respectively.</li>
+            <li>Palm down with both hands to exit streetview.</li>
+            <li>&nbsp;</li>
+
+            <h2>Points of Interests</h2>
+
+            <li>Palm down with both hands to show all points of interest near your focus.</li>
+            <li>&nbsp;</li>
+            
+            <h2>Directions</h2>
+
+            <li>Tap to place the starting location</li>
+            <li>Tap once more, somewhere else, to place the end location. The shortest path between the two markers should come up.</li>
+            <li>Tap again, as many as you want, to place waypoints between the path.</li>
+            <li>Poke the screen to clear all dropped markers.</li>
+            <li>&nbsp;</li>
+
+            <h2>Menu</h2>
+            <li>Clap to bring up the menu.</li>
+            <li>&nbsp;</li>
+          </ul>
+
+        </div>
     </body>
 </html>
