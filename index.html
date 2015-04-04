@@ -53,6 +53,10 @@
         width: 100%;
         margin: 5px 0 0 0;
       }
+      
+      #interests {
+        display: none;
+      }
     </style>
 
  		<script type="text/javascript" src="http://www.google.com/jsapi?"></script>
@@ -603,6 +607,9 @@ function initialize() {
   // Get rid of splash screen
   var splashScreen = document.getElementById('container');
   splashScreen.style.display = 'none';
+  
+  var interests =  document.getElementById('interests');
+  interests.style.display = 'initial';
 
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
   var myOrigin = new google.maps.LatLng(34.0737354, -118.4455506);
@@ -674,16 +681,19 @@ google.maps.event.addDomListener(window, 'load');
       </div> 
   	<body>
         	<div id="map-canvas"></div>
-        <div id="results">
-          <h2>Results</h2>
-          <ul id="places"></ul>
-          <button id="more">More results</button>
+            
+        <div id="interests">
+            <div id="results">
+              <h2>Results</h2>
+              <ul id="places"></ul>
+              <button id="more">More results</button>
+            </div>
+            <form method="get" action="http://www.google.com/search">
+             <input type="text" name="q" size="30" x-webkit-speech />
+             <input type="submit" value="Search" />
+            </form>
+            <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
         </div>
-        <form method="get" action="http://www.google.com/search">
-         <input type="text" name="q" size="30" x-webkit-speech />
-         <input type="submit" value="Search" />
-        </form>
-        <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
-        <p>Here we are</p>
+        
     </body>
 </html>
