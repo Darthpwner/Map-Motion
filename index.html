@@ -31,6 +31,7 @@ function move(frame) {
         frame.gestures.forEach(function(gesture){
             filterGesture("circle", zoom)(frame, gesture);
             filterGesture("keyTap", dropPin)(frame, gesture);
+            filterGesture("screenTap", removeAllPins)(frame, gesture);
             filterGesture("swipe", switchMode)(frame, gesture);
         });
     }
@@ -155,6 +156,16 @@ function dropPin(frame, keyTapGesture){
       title: 'Hello World!'
   });
 
+}
+
+function removeAllPins(frame, screenTapGesture){
+	alert("Remove Pins");
+  	var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
+  	var bounds = map.getBounds();
+  	if(!bounds) { return; }
+  	var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
+  	var hand = frame.hands[0];
+  	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
 }
 
 function switchMode(frame, swipeGesture){
