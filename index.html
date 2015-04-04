@@ -28,6 +28,7 @@ var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
 
+var streetViewFrameStart = 0;
 var streetView = false;
 function palmPosition(hand) {
     var position = hand.palmNormal;
@@ -41,19 +42,19 @@ function palmPosition(hand) {
 }
 
 function move(frame) {
-    // Look for any circle gestures and process the zoom
-    // TODO: filter out multiple circle gestures per frame
-    if(frame.valid && frame.gestures.length > 0){
-        frame.gestures.forEach(function(gesture){
-            filterGesture("circle", zoom)(frame, gesture);
-            filterGesture("keyTap", dropPin)(frame, gesture);
-            filterGesture("screenTap", removeAllPins)(frame, gesture);
-            filterGesture("swipe", switchMode)(frame, gesture);
-        });
-    }
-    markHands(frame);
-        
-    if (streetView === false) {
+       
+    if (streetView === false && frame.id > streetViewFrameStart + 50) {
+        // Look for any circle gestures and process the zoom
+        // TODO: filter out multiple circle gestures per frame
+        if(frame.valid && frame.gestures.length > 0){
+            frame.gestures.forEach(function(gesture){
+                filterGesture("circle", zoom)(frame, gesture);
+                filterGesture("keyTap", dropPin)(frame, gesture);
+                filterGesture("screenTap", removeAllPins)(frame, gesture);
+                filterGesture("swipe", switchMode)(frame, gesture);
+            });
+        }
+        markHands(frame);
     
         // Palm up to activate StreetView.  Two palms down to go back to map.
         if (frame.hands.length == 1 && streetView === false) {
@@ -69,6 +70,7 @@ function move(frame) {
                 panorama.setPosition(myLatlng);
                 panorama.setVisible(true);
                 streetView = true;
+                streetViewFrameStart = frame.id;
                 return;
             }
         }
@@ -135,8 +137,6 @@ function move(frame) {
           }
            // console.log("Clearing lastHand");
         }
-    
-    
     }
     
     else {
@@ -150,9 +150,14 @@ function move(frame) {
                 return;
             }
         }
+                
+        if(frame.valid && frame.gestures.length > 0){
+            frame.gestures.forEach(function(gesture){
+                filterGesture("swipe", streetViewSwipe)(frame, gesture);
+            });
+            return;
+        }
     }
-
-    
 }
 var handMarkers = [];
 var HEIGHT_OFFSET = 150;
@@ -322,6 +327,54 @@ function switchMode(frame, swipeGesture){
       map.setMapTypeId(google.maps.MapTypeId.HYBRID);
   }else if(swipeDirection=="down"){
       map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+  }
+}
+
+function streetViewSwipe(frame, swipeGesture) {
+  //Classify swipe as either horizontal or vertical
+  var isHorizontal = Math.abs(swipeGesture.direction[0]) > Math.abs(swipeGesture.direction[1]);
+  //Classify as right-left or up-down
+  if(isHorizontal){
+      if(swipeGesture.direction[0] > 0){
+          var swipeDirection = "right";
+      } else {
+          var swipeDirection = "left";
+      }
+  } else { //vertical
+      if(swipeGesture.direction[1] > 0){
+          var swipeDirection = "up";
+      } else {
+          var swipeDirection = "down";
+      }                  
+  }
+  
+  panorama = map.getStreetView(); 
+  var pov = panorama.getPov();
+        
+  if(swipeDirection=="right"){
+    panorama.setPov({
+      heading: panorama.getPov()['heading'] + 10,
+      pitch:0}
+    );
+    console.log("right");
+    console.log(panorama.getPov()['heading']);
+  }else if(swipeDirection=="left"){
+    panorama.setPov({
+        heading: panorama.getPov()['heading'] - 10,
+        pitch:0}
+    );
+    console.log("left");
+    console.log(panorama.getPov()['heading']);
+  }else if(swipeDirection=="up"){
+    var FORWARD = 1;
+    var pano = panorama.getLinks()[FORWARD]['pano'];
+    panorama.setPano(pano);
+    console.log('forward');
+  }else if(swipeDirection=="down"){
+    var BACKWARD = 0;
+    var pano = panorama.getLinks()[BACKWARD]['pano'];
+    panorama.setPano(pano);
+    console.log('back');
   }
 }
 
