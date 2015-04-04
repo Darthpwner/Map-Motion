@@ -334,47 +334,56 @@ function streetViewSwipe(frame, swipeGesture) {
   //Classify swipe as either horizontal or vertical
   var isHorizontal = Math.abs(swipeGesture.direction[0]) > Math.abs(swipeGesture.direction[1]);
   //Classify as right-left or up-down
+  var swipeDirection;
   if(isHorizontal){
       if(swipeGesture.direction[0] > 0){
-          var swipeDirection = "right";
+          swipeDirection = "right";
       } else {
-          var swipeDirection = "left";
+          swipeDirection = "left";
       }
   } else { //vertical
       if(swipeGesture.direction[1] > 0){
-          var swipeDirection = "up";
+          swipeDirection = "up";
       } else {
-          var swipeDirection = "down";
+          swipeDirection = "down";
       }                  
   }
   
-  panorama = map.getStreetView(); 
+  var panorama = map.getStreetView(); 
   var pov = panorama.getPov();
+  var pano;
+  var links;
+  var FORWARD = 1;
+  var BACKWARD = 0;
         
   if(swipeDirection=="right"){
     panorama.setPov({
-      heading: panorama.getPov()['heading'] + 10,
+      heading: pov.heading + 10,
       pitch:0}
     );
     console.log("right");
-    console.log(panorama.getPov()['heading']);
+    console.log(pov.heading);
   }else if(swipeDirection=="left"){
     panorama.setPov({
-        heading: panorama.getPov()['heading'] - 10,
+        heading: pov.heading - 10,
         pitch:0}
     );
     console.log("left");
-    console.log(panorama.getPov()['heading']);
+    console.log(pov.heading);
   }else if(swipeDirection=="up"){
-    var FORWARD = 1;
-    var pano = panorama.getLinks()[FORWARD]['pano'];
-    panorama.setPano(pano);
-    console.log('forward');
+    links = panorama.getLinks();
+    if (links) {
+        pano = links[FORWARD]['pano'];
+        panorama.setPano(pano);
+        console.log('forward');
+    }
   }else if(swipeDirection=="down"){
-    var BACKWARD = 0;
-    var pano = panorama.getLinks()[BACKWARD]['pano'];
-    panorama.setPano(pano);
-    console.log('back');
+    links = panorama.getLinks();
+    if (links) {
+        pano = links[BACKWARD]['pano'];
+        panorama.setPano(pano);
+        console.log('back');
+    }
   }
 }
 
