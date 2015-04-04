@@ -64,11 +64,12 @@
 		<div id="container" style="width: 1370px; height: auto;">
 			<div style="background-color: white; width: auto; height: 0px; float: top; background: linear-gradient(black, ‪#‎2D2B2B‬)">
 				<span style="font-size: 30px; color: ‪black ;margin-left: 0px; margin-top: 0px; margin-bottom: 0px;"></span>
-					<div style="text-align: center; padding-top: 50px;">
-						<img src="https://github.com/Darthpwner/Map-Motion/blob/gh-pages/Map-Motion-Logo.png?raw=true"/>
-					</div>
-	
-	
+                <div style="text-align: center; padding-top: 50px;">
+                    <img src="https://github.com/Darthpwner/Map-Motion/blob/gh-pages/Map-Motion-Logo.png?raw=true"/>
+                </div>
+            </div>
+        </div>
+
 
 
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
@@ -598,6 +599,11 @@ function callback(results, status, pagination) {
 }
 
 function initialize() {
+    
+  // Get rid of splash screen
+  var splashScreen = document.getElementById('container');
+  splashScreen.style.display = 'none';
+
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
   var myOrigin = new google.maps.LatLng(34.0737354, -118.4455506);
   var mapOptions = {
