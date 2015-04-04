@@ -23,6 +23,19 @@ var MAX_ZOOM = 22;
 var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
+
+var streetView = false;
+function palmPosition(hand) {
+    var position = hand.palmNormal;
+    var orientation;
+    if (position[1] > 0.75)
+        orientation = "up";
+    else
+        orientation = "down";
+    
+    return orientation;
+}
+
 function move(frame) {
     // Look for any circle gestures and process the zoom
     // TODO: filter out multiple circle gestures per frame
@@ -34,68 +47,107 @@ function move(frame) {
         });
     }
     markHands(frame);
-    // if there is one hand grabbing...
-    if(frame.hands.length > 0 && isGripped(frame.hands[LEFT_HAND])) {
-      var leftHand = frame.hands[LEFT_HAND];
-      var rightHand = frame.hands.length > 1 ? frame.hands[RIGHT_HAND] : undefined;
-      var separation;
-      
-      // If there was no previous closed position, capture it and exit
-      if(leftHandPrev == null) {
-        leftHandPrev = leftHand;
-        return;
-      }
-      // if there is a right hand and its gripped...
-      if(rightHand) {
-        if(isGripped(rightHand)) {
-          separation = Math.sqrt(
-                            Math.pow(rightHand.stabilizedPalmPosition[X] - leftHand.stabilizedPalmPosition[X], 2) + 
-                            Math.pow(rightHand.stabilizedPalmPosition[Y] - leftHand.stabilizedPalmPosition[Y], 2)
-                          );
-          // console.log("separation = " + separation + " ("+separationStart+")");
-          // ...and no previous separation, capture and exit
-          if(separationStart == null) {
-            separationStart = separation;
+        
+    if (streetView === false) {
+    
+        // Palm up to activate StreetView.  Two palms down to go back to map.
+        if (frame.hands.length == 1 && streetView === false) {
+            if (palmPosition(frame.hands[0]) == "up") {
+                var hand = frame.hands[0];
+                var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
+                var bounds = map.getBounds();
+                if(!bounds) { return; }
+                var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
+                var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
+                var panorama = map.getStreetView();
+                map.set('streetViewControl', true);
+                panorama.setPosition(myLatlng);
+                panorama.setVisible(true);
+                streetView = true;
+                return;
+            }
+        }
+
+        // if there is one hand grabbing...
+        if(frame.hands.length > 0 && isGripped(frame.hands[LEFT_HAND])) {
+          var leftHand = frame.hands[LEFT_HAND];
+          var rightHand = frame.hands.length > 1 ? frame.hands[RIGHT_HAND] : undefined;
+          var separation;
+          
+          // If there was no previous closed position, capture it and exit
+          if(leftHandPrev == null) {
+            leftHandPrev = leftHand;
             return;
           }
-          // Calculate if we need to change the zoom level
-          var currentZoom = map.getZoom();
-          if(currentZoom > 1 && separation < (separationStart / SEPARATION_SCALING) ) {
-            map.setZoom( currentZoom - 1 );
-            separationStart = separation;
-          } else if( currentZoom < MAX_ZOOM && separation > (SEPARATION_SCALING * separationStart) ) {
-            map.setZoom( currentZoom + 1 );
-            separationStart = separation;
+          // if there is a right hand and its gripped...
+          if(rightHand) {
+            if(isGripped(rightHand)) {
+              separation = Math.sqrt(
+                                Math.pow(rightHand.stabilizedPalmPosition[X] - leftHand.stabilizedPalmPosition[X], 2) + 
+                                Math.pow(rightHand.stabilizedPalmPosition[Y] - leftHand.stabilizedPalmPosition[Y], 2)
+                              );
+              // console.log("separation = " + separation + " ("+separationStart+")");
+              // ...and no previous separation, capture and exit
+              if(separationStart == null) {
+                separationStart = separation;
+                return;
+              }
+              // Calculate if we need to change the zoom level
+              var currentZoom = map.getZoom();
+              if(currentZoom > 1 && separation < (separationStart / SEPARATION_SCALING) ) {
+                map.setZoom( currentZoom - 1 );
+                separationStart = separation;
+              } else if( currentZoom < MAX_ZOOM && separation > (SEPARATION_SCALING * separationStart) ) {
+                map.setZoom( currentZoom + 1 );
+                separationStart = separation;
+              }
+            // If the right hand is not gripped...
+            } else if(separationStart != null) {
+              separationStart = null;
+            }
           }
-        // If the right hand is not gripped...
-        } else if(separationStart != null) {
-          separationStart = null;
+          // Calculate how much the hand moved
+          var dX = leftHandPrev.stabilizedPalmPosition[X] - leftHand.stabilizedPalmPosition[X];
+          var dY = leftHandPrev.stabilizedPalmPosition[Y] - leftHand.stabilizedPalmPosition[Y];
+          // console.log("Movement: " + dX + ","+dY);
+          var center = map.getCenter();
+          var scaling = 4.0 / Math.pow(2, map.getZoom()-1);
+          var newLat = center.lat() + dY * scaling;
+          var newLng = center.lng() + dX * scaling;
+          var newCenter = new google.maps.LatLng(newLat, newLng);
+          
+          // console.log(newCenter)
+          map.setCenter(newCenter);
+          leftHandPrev = leftHand;
+        } else {
+          // If the left hand is not in a grab position, clear the last hand position
+          if(frame.hands.length > LEFT_HAND && !isGripped(frame.hands[LEFT_HAND]) && leftHandPrev != null) {
+            leftHandPrev = null;
+          }
+          // if the right hand is not in a grab position, clear the separation
+          if(frame.hands.length > RIGHT_HAND && !isGripped(frame.hands[RIGHT_HAND]) && separationStart != null) {
+            separationStart = null;
+          }
+           // console.log("Clearing lastHand");
         }
-      }
-      // Calculate how much the hand moved
-      var dX = leftHandPrev.stabilizedPalmPosition[X] - leftHand.stabilizedPalmPosition[X];
-      var dY = leftHandPrev.stabilizedPalmPosition[Y] - leftHand.stabilizedPalmPosition[Y];
-      // console.log("Movement: " + dX + ","+dY);
-      var center = map.getCenter();
-      var scaling = 4.0 / Math.pow(2, map.getZoom()-1);
-      var newLat = center.lat() + dY * scaling;
-      var newLng = center.lng() + dX * scaling;
-      var newCenter = new google.maps.LatLng(newLat, newLng);
-      
-      // console.log(newCenter)
-      map.setCenter(newCenter);
-      leftHandPrev = leftHand;
-    } else {
-      // If the left hand is not in a grab position, clear the last hand position
-      if(frame.hands.length > LEFT_HAND && !isGripped(frame.hands[LEFT_HAND]) && leftHandPrev != null) {
-        leftHandPrev = null;
-      }
-      // if the right hand is not in a grab position, clear the separation
-      if(frame.hands.length > RIGHT_HAND && !isGripped(frame.hands[RIGHT_HAND]) && separationStart != null) {
-        separationStart = null;
-      }
-       // console.log("Clearing lastHand");
+    
+    
     }
+    
+    else {
+        // Two palms down to exit StreetView and return to map.
+        if (frame.hands.length === 2 && streetView === true) {
+            if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
+                map.set('streetViewControl', false);
+                var panorama = map.getStreetView();
+                panorama.setVisible(false);
+                streetView = false;
+                return;
+            }
+        }
+    }
+
+    
 }
 var handMarkers = [];
 var HEIGHT_OFFSET = 150;
