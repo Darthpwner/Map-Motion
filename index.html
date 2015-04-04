@@ -97,6 +97,9 @@ var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
 
+
+var lookupClickedLastFrame = 0;
+
 var streetViewFrameStart = 0;
 var streetView = false;
 function palmPosition(hand) {
@@ -135,6 +138,15 @@ function move(frame) {
             });
         }
         markHands(frame);
+        
+        // Get points of interest by pointing both palms downward while viewing the map (not StreetView)
+        if (frame.hands.length === 2 && frame.id > lookupClickedLastFrame + 50) {
+            if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
+                document.getElementById("lookup").click();
+                lookupClickedLastFrame = frame.id;
+                return;
+            }
+        }        
     
         // Palm up to activate StreetView.  Two palms down to go back to map.
         if (frame.hands.length == 1 && streetView === false) {
@@ -179,6 +191,7 @@ function move(frame) {
                 separationStart = separation;
                 return;
               }
+/*
               // Calculate if we need to change the zoom level
               var currentZoom = map.getZoom();
               if(currentZoom > 1 && separation < (separationStart / SEPARATION_SCALING) ) {
@@ -188,6 +201,7 @@ function move(frame) {
                 map.setZoom( currentZoom + 1 );
                 separationStart = separation;
               }
+*/
             // If the right hand is not gripped...
             } else if(separationStart != null) {
               separationStart = null;
