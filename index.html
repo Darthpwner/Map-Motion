@@ -141,6 +141,9 @@ function markHands(frame) {
       }
 }
 
+var map;
+var markers = [];
+
 function dropPin(frame, keyTapGesture){
   //alert("Drop Pin");
   var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
@@ -156,16 +159,29 @@ function dropPin(frame, keyTapGesture){
       title: 'Hello World!'
   });
 
+  markers.push(marker);
+}
+
+function setAllMap(map){
+	for (var i = 0; i < markers.length; i++){
+		markers[i].setMap(map);
+	}
+}
+
+function clearMarkers(){
+	setAllMap(null);
 }
 
 function removeAllPins(frame, screenTapGesture){
 	alert("Remove Pins");
-  	var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
+  	/*var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
   	var bounds = map.getBounds();
   	if(!bounds) { return; }
   	var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
   	var hand = frame.hands[0];
-  	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
+  	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));*/
+  	clearMarkers();
+  	markers = [];
 }
 
 function switchMode(frame, swipeGesture){
