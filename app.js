@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var map;
 var leftHandPrev;
 var separationStart;
@@ -24,6 +25,90 @@ function move(frame) {
       if(leftHandPrev == null) {
         leftHandPrev = leftHand;
         return;
+=======
+function initialize() {
+var mapOptions = {
+  center: { lat: 34.0737354, lng: -118.4455506},
+  zoom: 15
+};
+var map = new google.maps.Map(document.getElementById('map-canvas'),
+    mapOptions);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
+// Store frame for motion functions
+var previousFrame = null;
+var paused = false;
+var pauseOnGesture = false;
+
+// Setup Leap loop with frame callback function
+var controllerOptions = {enableGestures: true};
+
+// to use HMD mode:
+// controllerOptions.optimizeHMD = true;
+
+Leap.loop(controllerOptions, function(frame) {
+  if (paused) {
+    return; // Skip this update
+  }
+
+  // Display Frame object data
+  var frameOutput = document.getElementById("frameData");
+
+  var frameString = "Frame ID: " + frame.id  + "<br />"
+                  + "Timestamp: " + frame.timestamp + " &micro;s<br />"
+                  + "Hands: " + frame.hands.length + "<br />"
+                  + "Fingers: " + frame.fingers.length + "<br />"
+                  + "Tools: " + frame.tools.length + "<br />"
+                  + "Gestures: " + frame.gestures.length + "<br />";
+
+  // Frame motion factors
+  if (previousFrame && previousFrame.valid) {
+    var translation = frame.translation(previousFrame);
+    frameString += "Translation: " + vectorToString(translation) + " mm <br />";
+
+    var rotationAxis = frame.rotationAxis(previousFrame);
+    var rotationAngle = frame.rotationAngle(previousFrame);
+    frameString += "Rotation axis: " + vectorToString(rotationAxis, 2) + "<br />";
+    frameString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
+
+    var scaleFactor = frame.scaleFactor(previousFrame);
+    frameString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
+  }
+  frameOutput.innerHTML = "<div style='width:300px; float:left; padding:5px'>" + frameString + "</div>";
+
+  // Display Hand object data
+  var handOutput = document.getElementById("handData");
+  var handString = "";
+  if (frame.hands.length > 0) {
+    for (var i = 0; i < frame.hands.length; i++) {
+      var hand = frame.hands[i];
+
+      handString += "<div style='width:300px; float:left; padding:5px'>";
+      handString += "Hand ID: " + hand.id + "<br />";
+      handString += "Type: " + hand.type + " hand" + "<br />";
+      handString += "Direction: " + vectorToString(hand.direction, 2) + "<br />";
+      handString += "Palm position: " + vectorToString(hand.palmPosition) + " mm<br />";
+      handString += "Grab strength: " + hand.grabStrength + "<br />";
+      handString += "Pinch strength: " + hand.pinchStrength + "<br />";
+      handString += "Confidence: " + hand.confidence + "<br />";
+      handString += "Arm direction: " + vectorToString(hand.arm.direction()) + "<br />";
+      handString += "Arm center: " + vectorToString(hand.arm.center()) + "<br />";
+      handString += "Arm up vector: " + vectorToString(hand.arm.basis[1]) + "<br />";
+
+      // Hand motion factors
+      if (previousFrame && previousFrame.valid) {
+        var translation = hand.translation(previousFrame);
+        handString += "Translation: " + vectorToString(translation) + " mm<br />";
+
+        var rotationAxis = hand.rotationAxis(previousFrame, 2);
+        var rotationAngle = hand.rotationAngle(previousFrame);
+        handString += "Rotation axis: " + vectorToString(rotationAxis) + "<br />";
+        handString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
+
+        var scaleFactor = hand.scaleFactor(previousFrame);
+        handString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
+>>>>>>> origin/gh-pages
       }
       // if there is a right hand and its gripped...
       if(rightHand) {
@@ -190,4 +275,61 @@ function isClockwise(frame, gesture) {
     if (dotProduct  >  0) clockwise = true;
     return clockwise;
 }
+<<<<<<< HEAD
 google.maps.event.addDomListener(window, 'load', initialize);
+=======
+
+//////////////////////////////////////////////////////////////////////////////
+/*Swipe Gestures*/
+/*
+Leap.loop(function(frame) {
+
+  frame.hands.forEach(function(hand, index) {
+    var cat = ( cats[index] || (cats[index] = new Cat()) );
+    cat.setTransform(hand.screenPosition(), hand.roll());
+  });
+
+}).use('screenPosition', {scale: 0.25});
+*/
+
+var cats = {};
+
+Leap.loop(function(frame) {
+
+  frame.hands.forEach(function(hand, index) {
+
+    var cat = ( cats[index] || (cats[index] = new Cat()) );
+    cat.setTransform(hand.screenPosition(), hand.roll());
+
+  });
+
+}).use('screenPosition', {scale: 0.25});
+
+
+var Cat = function() {
+  var cat = this;
+  var img = document.createElement('img');
+  img.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/109794/cat_2.png';
+  img.style.position = 'absolute';
+  img.onload = function () {
+    cat.setTransform([window.innerWidth/2,window.innerHeight/2], 0);
+    document.body.appendChild(img);
+  }
+
+  cat.setTransform = function(position, rotation) {
+
+    img.style.left = position[0] - img.width  / 2 + 'px';
+    img.style.top  = position[1] - img.height / 2 + 'px';
+
+    img.style.transform = 'rotate(' + -rotation + 'rad)';
+
+    img.style.webkitTransform = img.style.MozTransform = img.style.msTransform =
+    img.style.OTransform = img.style.transform;
+
+  };
+
+};
+
+cats[0] = new Cat();
+//////////////////////////////////////////////////////////////////////////////
+>>>>>>> origin/gh-pages
