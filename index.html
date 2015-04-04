@@ -18,6 +18,7 @@
     <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
     <script>
 var map;
+var markers = [];
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var leftHandPrev;
@@ -35,6 +36,7 @@ function move(frame) {
             filterGesture("keyTap", dropPin)(frame, gesture);
             filterGesture("screenTap", removeAllPins)(frame, gesture);
             filterGesture("swipe", switchMode)(frame, gesture);
+            filterGesture("screenTap", deleteAllPins)(frame, gesture);
         });
     }
     markHands(frame);
@@ -183,17 +185,14 @@ function dropPin(frame, keyTapGesture){
       map: map,
       title: 'Hello World!'
   });
+  markers.push(marker);
   if(pins == 0){
-
     start = myLatlng;
-
-  }
-  if(pins == 1){
+  }else if(pins == 1){
     end = myLatlng;
     //alert("cal");
     calcRoute();
-  }
-  if(pins >= 2){
+  }else if(pins >= 2){
     for (var i = 2; i <= pins; i++) {
       waypts.push({
           location:myLatlng,
@@ -201,7 +200,6 @@ function dropPin(frame, keyTapGesture){
       });
     }
     calcRoute();
-
   }
   pins = pins + 1;
 
@@ -229,6 +227,15 @@ function removeAllPins(frame, screenTapGesture){
   	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));*/
   	clearMarkers();
   	markers = [];
+}
+
+function deleteAllPins(frame, gesture){
+  alert("POKE");
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+  markers = [];
+v
 }
 
 function switchMode(frame, swipeGesture){
