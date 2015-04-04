@@ -23,6 +23,7 @@ var MAX_ZOOM = 22;
 var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
+
 function move(frame) {
     // Look for any circle gestures and process the zoom
     // TODO: filter out multiple circle gestures per frame
@@ -34,6 +35,8 @@ function move(frame) {
         });
     }
     markHands(frame);
+    menuOpen(frame);
+
     // if there is one hand grabbing...
     if(frame.hands.length > 0 && isGripped(frame.hands[LEFT_HAND])) {
       var leftHand = frame.hands[LEFT_HAND];
@@ -45,6 +48,7 @@ function move(frame) {
         leftHandPrev = leftHand;
         return;
       }
+
       // if there is a right hand and its gripped...
       if(rightHand) {
         if(isGripped(rightHand)) {
@@ -70,6 +74,7 @@ function move(frame) {
         // If the right hand is not gripped...
         } else if(separationStart != null) {
           separationStart = null;
+
         }
       }
       // Calculate how much the hand moved
@@ -100,6 +105,7 @@ function move(frame) {
 var handMarkers = [];
 var HEIGHT_OFFSET = 150;
 var BASE_MARKER_SIZE_GRIPPED = 350000, BASE_MARKER_SIZE_UNGRIPPED = 500000;
+
 function markHands(frame) {
     var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
       var bounds = map.getBounds();
@@ -137,6 +143,16 @@ function markHands(frame) {
             });
           }
       }
+}
+
+function menuOpen(frame){
+	if(frame.hands.length == 2){
+		var r = frame.hands[1].stabilizedPalmPosition[0];
+		var l = frame.hands[0].stabilizedPalmPosition[0];
+		if(l < 30 && r > -30) { 
+			alert("MENU");
+		}
+	}
 }
 
 function dropPin(frame, keyTapGesture){
