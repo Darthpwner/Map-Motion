@@ -68,7 +68,7 @@ function move(frame) {
     // This is to catch a bug somewhere that causes the StreetView to not be visible
     panorama = map.getStreetView();
     if (panorama.getVisible() === false && streetView === true) {
-        panorma.setVisible(true);
+        panorama.setVisible(true);
         console.log("Bug avoided");
         return;
     }
