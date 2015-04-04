@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Map Motion</title>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
       html, body, #map-canvas {
@@ -11,12 +11,31 @@
         height: 100%;
       }
     </style>
+
+ 		<script type="text/javascript" src="http://www.google.com/jsapi?"></script>
+		<script type="text/javascript">
+			google.load("feeds", "1") ;//Load Google Ajax Feed API (version 1)
+		</script>
+	</head>
+
+		<div id="container" style="width: 1370px; height: auto;">
+			<div style="background-color: white; width: auto; height: 0px; float: top; background: linear-gradient(black, ‪#‎2D2B2B‬)">
+				<span style="font-size: 30px; color: ‪black ;margin-left: 0px; margin-top: 0px; margin-bottom: 0px;"></span>
+					<div style="text-align: center; padding-top: 50px;">
+						<img src="https://github.com/Darthpwner/Map-Motion/blob/gh-pages/Map-Motion-Logo.png?raw=true"/>
+					</div>
+	
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+	<script type="text/javascript">
+
+
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="https://js.leapmotion.com/leap-0.6.3.min.js"></script>
     <script src="https://js.leapmotion.com/leap-plugins-0.1.6.js"></script>
     <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
     <script>
+
 var map;
 var markers = [];
 var directionsDisplay;
@@ -507,12 +526,13 @@ function isClockwise(frame, gesture) {
     if (dotProduct  >  0) clockwise = true;
     return clockwise;
 }
-google.maps.event.addDomListener(window, 'load', initialize);
-    </script>
 
-  </head>
-  <body>
-    <div id="map-canvas"></div>
-    <p>Here we are</p>
-  </body>
+setTimeout(initialize, 1500 );
+google.maps.event.addDomListener(window, 'load');
+    </script>
+    		</div>
+    	</div>
+  	<body>
+    	<div id="map-canvas"></div>
+  	</body>
 </html>
