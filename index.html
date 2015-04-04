@@ -4,21 +4,71 @@
     <title>Map Motion</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
+    <link rel="shortcut icon" href="../favicon.ico">
+
     <style>
       html, body, #map-canvas {
         margin: 0;
         padding: 0;
-        height: 100%;
+        height: 95%;
+      }
+
+      #results {
+        font-family: Arial, Helvetica, sans-serif;
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        margin-top: -195px;
+        height: 380px;
+        width: 200px;
+        padding: 5px;
+        z-index: 5;
+        border: 1px solid #999;
+        background: #fff;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 0 0 5px 0;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        height: 321px;
+        width: 200px;
+        overflow-y: scroll;
+      }
+      li {
+        background-color: #f1f1f1;
+        padding: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      li:nth-child(odd) {
+        background-color: #fcfcfc;
+      }
+      #more {
+        width: 100%;
+        margin: 5px 0 0 0;
       }
     </style>
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-    <script src="https://js.leapmotion.com/leap-0.6.3.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+    <script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script>
     <script src="https://js.leapmotion.com/leap-plugins-0.1.6.js"></script>
     <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script>
 var map;
+var placesList;
+var service;
+var infowindow;
 var markers = [];
+var start;
+var end;
+var pins = 0;
+var waypts = [];
 var directionsDisplay;
 var directionsService = new google.maps.DirectionsService();
 var leftHandPrev;
@@ -196,14 +246,6 @@ function markHands(frame) {
       }
 }
 
-
-var map;
-var markers = [];
-
-var start;
-var end;
-var pins = 0;
-var waypts = [];
 function calcRoute() {
   //alert(start);
   //alert(end);
@@ -270,13 +312,7 @@ function clearMarkers(){
 }
 
 function removeAllPins(frame, screenTapGesture){
-	//alert("Remove Pins");
-  	/*var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
-  	var bounds = map.getBounds();
-  	if(!bounds) { return; }
-  	var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
-  	var hand = frame.hands[0];
-  	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));*/
+
   	clearMarkers();
   	markers = [];
     waypts=[];
@@ -285,16 +321,6 @@ function removeAllPins(frame, screenTapGesture){
     pins=0;
     directionsDisplay.setMap();
 }
-/*
-function deleteAllPins(frame, gesture){
-  //alert("POKE");
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
-  }
-  markers = [];
-
-}
-*/
 
 function switchMode(frame, swipeGesture){
 
@@ -353,19 +379,113 @@ function zoom(frame, circleGesture) {
         }
     }
 }
+
+function createMarkers(places) {
+  var bounds = new google.maps.LatLngBounds();
+
+  for (var i = 0, place; place = places[i]; i++) {
+    var image = {
+      url: place.icon,
+      size: new google.maps.Size(71, 71),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      scaledSize: new google.maps.Size(25, 25)
+    };
+    
+    var mytext = place.name;
+    var myinfowindow = new google.maps.InfoWindow({
+        content: mytext
+    });
+
+    var marker = new google.maps.Marker({
+      map: map,
+      icon: image,
+      title: place.name,
+      position: place.geometry.location,
+      infowindow: myinfowindow,
+      clickable: true
+    });
+    marker.infowindow.open(map,marker);
+    var request =  {
+      reference: place.reference
+    };
+
+    google.maps.event.addListener(marker,'click',function(){
+      this.infowindow.open(map, this);
+    });
+    
+
+    placesList.innerHTML += '<li>' + place.name + '</li>';
+
+    bounds.extend(place.geometry.location);
+  }
+  map.fitBounds(bounds);
+}
+
+function showNearByPOI(){
+  /*
+  var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
+  var bounds = map.getBounds();
+  if(!bounds) { return; }
+  var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
+  var hand = frame.hands[0];
+  var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
+  */
+  var myOrigin = map.getCenter();
+  var request = {
+    location: myOrigin,
+    radius: 500,
+    types: ['store']
+  };
+  service.nearbySearch(request, callback);
+}
+
+function callback(results, status, pagination) {
+  if (status != google.maps.places.PlacesServiceStatus.OK) {
+    return;
+  } else {
+    createMarkers(results);
+
+    if (pagination.hasNextPage) {
+      var moreButton = document.getElementById('more');
+
+      moreButton.disabled = false;
+
+      google.maps.event.addDomListenerOnce(moreButton, 'click',
+          function() {
+        moreButton.disabled = true;
+        alert("more");
+        pagination.nextPage();
+      });
+    }
+  }
+}
+
 function initialize() {
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
+  var myOrigin = new google.maps.LatLng(34.0737354, -118.4455506);
   var mapOptions = {
     zoom: 15,
-    center: new google.maps.LatLng(34.0737354, -118.4455506),
+    center: myOrigin,
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControlOptions: {
         position: google.maps.ControlPosition.TOP_LEFT
     }
   };
-  map = new google.maps.Map(document.getElementById('map-canvas'),
-      mapOptions);
+  map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
   map.setTilt(45);
+
+  var request = {
+    location: myOrigin,
+    radius: 500,
+    types: ['store']
+  };
+
+  placesList = document.getElementById('places');
+  infowindow = new google.maps.InfoWindow();
+  service = new google.maps.places.PlacesService(map);
+  service.nearbySearch(request, callback);
+  //showNearByPOI();
   directionsDisplay.setMap(map);
   // listen to Leap Motion
   Leap.loop({enableGestures: true}, move);
@@ -409,7 +529,18 @@ google.maps.event.addDomListener(window, 'load', initialize);
 
   </head>
   <body>
+
     <div id="map-canvas"></div>
+    <div id="results">
+      <h2>Results</h2>
+      <ul id="places"></ul>
+      <button id="more">More results</button>
+    </div>
+    <form method="get" action="http://www.google.com/search">
+     <input type="text" name="q" size="30" x-webkit-speech />
+     <input type="submit" value="Search" />
+    </form>
+    <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
     <p>Here we are</p>
   </body>
 </html>
