@@ -279,6 +279,7 @@ function removeAllPins(frame, screenTapGesture){
   	var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));*/
   	clearMarkers();
   	markers = [];
+    waypts=[];
     start=null;
     end=null;
     pins=0;
