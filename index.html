@@ -12,12 +12,14 @@
       }
     </style>
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
-    <script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="https://js.leapmotion.com/leap-0.6.3.min.js"></script>
     <script src="https://js.leapmotion.com/leap-plugins-0.1.6.js"></script>
     <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
     <script>
 var map;
+var directionsDisplay;
+var directionsService = new google.maps.DirectionsService();
 var leftHandPrev;
 var separationStart;
 var MAX_ZOOM = 22;
@@ -141,8 +143,31 @@ function markHands(frame) {
       }
 }
 
+
 var map;
 var markers = [];
+
+var start;
+var end;
+var pins = 0;
+var waypts = [];
+function calcRoute() {
+  //alert(start);
+  //alert(end);
+  var request = {
+      origin:start,
+      destination:end,
+      waypoints:waypts,
+      optimizeWaypoints: true,
+      travelMode: google.maps.TravelMode.DRIVING
+  };
+  directionsService.route(request, function(response, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+      //alert("sd");
+      directionsDisplay.setDirections(response);
+    }
+  });
+}
 
 function dropPin(frame, keyTapGesture){
   //alert("Drop Pin");
@@ -158,6 +183,28 @@ function dropPin(frame, keyTapGesture){
       map: map,
       title: 'Hello World!'
   });
+  if(pins == 0){
+
+    start = myLatlng;
+
+  }
+  if(pins == 1){
+    end = myLatlng;
+    //alert("cal");
+    calcRoute();
+  }
+  if(pins >= 2){
+    for (var i = 2; i <= pins; i++) {
+      waypts.push({
+          location:myLatlng,
+          stopover:true
+      });
+    }
+    calcRoute();
+
+  }
+  pins = pins + 1;
+
 
   markers.push(marker);
 }
@@ -204,7 +251,6 @@ function switchMode(frame, swipeGesture){
   }
   if(swipeDirection=="right"){
         map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-
   }else if(swipeDirection=="left"){
       map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
   }else if(swipeDirection=="up"){
@@ -243,6 +289,8 @@ function zoom(frame, circleGesture) {
     }
 }
 function initialize() {
+  directionsDisplay = new google.maps.DirectionsRenderer();
+
   var mapOptions = {
     zoom: 15,
     center: new google.maps.LatLng(34.0737354, -118.4455506),
@@ -254,6 +302,7 @@ function initialize() {
   map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
   map.setTilt(45);
+  directionsDisplay.setMap(map);
   // listen to Leap Motion
   Leap.loop({enableGestures: true}, move);
 }
