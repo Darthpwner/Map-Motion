@@ -15,6 +15,16 @@
         padding: 0;
         height: 100%;
       }
+      #nc{
+        position: absolute;
+        bottom: 0px;
+        left: 15px;
+        text-align: right;
+        color: #727378;
+        font-size: 1.1em;
+        padding-bottom: 1em;
+      }
+
       .controls {
         margin-top: 16px;
         border: 1px solid transparent;
@@ -293,7 +303,7 @@
 				<span style="font-size: 30px; color: ‪black ;margin-left: 0px; margin-top: 0px; margin-bottom: 0px;"></span>
                 <div style="text-align: center; padding-top: 25px;">
                     <h1>Map Motion</h1>
-                    <h2>Leap Motion meets Google Maps. In the most feature-rich way possible.</h2>
+                    <h2>Leap Motion meets Google Maps. In the world's most feature-rich way possible.</h2>
 
                     <p><img class="splash_img" id="gmicon" src="googlemapsicon.png" style="width: 20%; height: auto"/><img class="splash_img" id="plusicon" src="plus.png" style="width: 10%; height: auto"/><img class="splash_img" id="lmicon" src="leapmotion.jpg" style="width: 40%; height: auto"/></p>
                     <button class="pure-button pure-button-primary" onclick="showApp()"  id="continue">Continue</button>
@@ -306,6 +316,7 @@
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
     <script src="https://cdn.jsdelivr.net/velocity/1.2.2/velocity.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
     <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
@@ -322,6 +333,13 @@ $('#gmicon').css('visibility','visible').hide().delay(800).fadeIn('slow');
 $('#plusicon').css('visibility','visible').hide().delay(1600).fadeIn('slow');
 $('#lmicon').css('visibility','visible').hide().delay(2400).fadeIn('slow');
 $('#continue').css('visibility','visible').hide().delay(3000).fadeIn('slow');
+
+
+      $("#plusicon").click(function(){
+        $(this).effect( "bounce", {times:3}, 300 );
+      });
+
+
 
 var map;
 var placesList;
@@ -1076,8 +1094,10 @@ google.maps.event.addDomListener(window, 'load');
             <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
             
         </div>
+        <div id="nc">Free domain name provided by <a href="https://www.namecheap.com/"><img style="height:20px;" src="nc.png"/></a></div>
     </body>
+
     <footer>
-      Map Motion © 2015
+      Map Motion © 2015. An LA Hacks Project.
     </footer>
 </html>
