@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+<meta charset="utf-8">
+<title>Mapping The News</title>
+<link href='http://fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
+<font face="roboto"></font>
+<link href="styles.css" rel="stylesheet" type="text/css">
+<style>
+html, body, ‪#‎map‬-canvas {
+height: 100%;
+margin: 0px;
+padding: 0px
+}
+</style>
+	<script type="text/javascript" src="http://www.google.com/jsapi?">
+	</script>
+	
+	<script type="text/javascript">
+		google.load("feeds", "1") ;//Load Google Ajax Feed API (version 1)
+	</script>
+</head>
+
+	<div id="feeddiv"></div>
+	<div id="container" style="width: 1370px; height: auto;">
+	<div style="background-color: black; width: auto; height: 50px; float: top; background: linear-gradient(black, ‪#‎2D2B2B‬)">
+	<span style="font-size: 30px; color: ‪#‎ffffff‬ ;margin-left: 10px; margin-top: 5px; margin-bottom: 5px;">Mapping The News</span>
+	<div style="text-align: center; padding-top: 50px;">
+		<img src="http://mappingthenews.com/ha…/test_3/mappingthenews-logo.png"/>
+	</div>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+	<script type="text/javascript">
+
+var feedcontainer=document.getElementById("feeddiv");
+var feedurl13="http://www.latimes.com/local/rss2.0.xml";
+var feedlimit=5;
+var rssoutput13="<b>Los Angeles:</b><br /><ul>";
+var map;
+var newmap = new google.maps.LatLng(0,0);
+var MY_MAPTYPE_ID = 'custom_style';
+function rssfeedsetup(){
+var feedpointer13=new google.feeds.Feed(feedurl13); //Google Feed API method
+feedpointer13.setNumEntries(feedlimit); //Google Feed API method
+feedpointer13.load(displayfeed13); //Google Feed API method
+}
+function displayfeed13(result){
+if (!result.error){
+var thefeeds13=result.feed.entries;
+console.log(thefeeds13);
+for (var i=0; i<thefeeds13.length; i++)
+rssoutput13+="<li><a href='" + thefeeds13[i].link + "'>" + thefeeds13[i].publishedDate + " " + thefeeds13[i].title +"</a></li>"
+rssoutput13+="</ul>";
+//feedcontainer.innerHTML=rssoutput;
+// Los Angeles Marker
+var markerOptions13 = {
+position: new google.maps.LatLng(34.0500, -118.2500),
+map: map
+};
+var marker13 = new google.maps.Marker(markerOptions13);
+marker13.setMap(map);
+var losan = "Los Angeles";
+var infoWindowOptions13 = {
+content: rssoutput13
+};
+console.log(feedcontainer.innerHTML);
+var infoWindow13 = new google.maps.InfoWindow13(infoWindowOptions13);
+google.maps.event.addListener(marker13,'click',function(e){
+infoWindow13.open(map, marker13);
+setTimeout(function () { infoWindow13.close(); }, 3000);
+});
+}
+else
+alert("Error fetching feeds!")
+}
+function initialize() {
+var featureOpts = [
+{
+stylers: [
+{ hue: '#020146' },
+{ visibility: 'simplified' },
+{ gamma: 0.6 },
+{ weight:0.7 }
+]
+},
+{
+featureType: 'water',
+stylers: [
+{ color: '#013588' }
+]
+}
+];
+var mapOptions = {
+zoom: 2,
+center: newmap,
+mapTypeControlOptions: {
+mapTypeIds: [google.maps.MapTypeId.ROADMAP, MY_MAPTYPE_ID]
+},
+mapTypeId: MY_MAPTYPE_ID
+};
+map = new google.maps.Map(document.getElementById('map-canvas'),
+mapOptions);
+var styledMapOptions = {
+name: 'Blue Style'
+};
+var customMapType = new google.maps.StyledMapType(featureOpts, styledMapOptions);
+map.mapTypes.set(MY_MAPTYPE_ID, customMapType);
+//San Fran Marker
+var markerOptions = {
+position: new google.maps.LatLng(37.7831, -122.4039),
+map: map
+};
+var marker = new google.maps.Marker(markerOptions);
+marker.setMap(map);
+var sanfrancisco = "San Francisco";
+var infoWindowOptions = {
+content: sanfrancisco
+};
+var infoWindow = new google.maps.InfoWindow(infoWindowOptions);
+google.maps.event.addListener(marker,'click',function(e){
+infoWindow.open(map, marker);
+setTimeout(function () { infoWindow.close(); }, 3000);
+});
+//London Marker
+var markerOptions2 = {
+position: new google.maps.LatLng(51.5072, 0.1275),
+map: map
+};
+var marker2 = new google.maps.Marker(markerOptions2);
+marker2.setMap(map);
+var london = "London";
+var infoWindowOptions2 = {
+content: london
+};
+var infoWindow2 = new google.maps.InfoWindow(infoWindowOptions2);
+google.maps.event.addListener(marker2,'click',function(e){
+infoWindow2.open(map, marker2);
+setTimeout(function () { infoWindow2.close(); }, 3000);
+});
+//Nagoya Marker
+var markerOptions3 = {
+position: new google.maps.LatLng(35.1815, 136.9064),
+map: map
+};
+var marker3 = new google.maps.Marker(markerOptions3);
+marker3.setMap(map);
+var nagoya = "Nagoya";
+var infoWindowOptions3 = {
+content: nagoya
+};
+var infoWindow3 = new google.maps.InfoWindow(infoWindowOptions3);
+google.maps.event.addListener(marker3,'click',function(e){
+infoWindow3.open(map, marker3);
+setTimeout(function () { infoWindow3.close(); }, 3000);
+});
+//Beijing Marker
+var markerOptions4 = {
+position: new google.maps.LatLng(39.9139, 116.3917),
+map: map
+};
+var marker4 = new google.maps.Marker(markerOptions4);
+marker4.setMap(map);
+var beijing = "Beijing";
+var infoWindowOptions4 = {
+content: beijing
+};
+var infoWindow4 = new google.maps.InfoWindow(infoWindowOptions4);
+google.maps.event.addListener(marker4,'click',function(e){
+infoWindow4.open(map, marker4);
+setTimeout(function () { infoWindow4.close(); }, 3000);
+});
+//Boston Marker
+var markerOptions5 = {
+position: new google.maps.LatLng(42.3581, -71.0636),
+map: map
+};
+var marker5 = new google.maps.Marker(markerOptions5);
+marker5.setMap(map);
+var boston = "Boston";
+var infoWindowOptions5 = {
+content: boston
+};
+var infoWindow5 = new google.maps.InfoWindow(infoWindowOptions5);
+google.maps.event.addListener(marker5,'click',function(e){
+infoWindow5.open(map, marker5);
+setTimeout(function () { infoWindow5.close(); }, 3000);
+});
+// Buenos Aires Marker
+var markerOptions6 = {
+position: new google.maps.LatLng(-34.6033, -58.3817),
+map: map
+};
+var marker6 = new google.maps.Marker(markerOptions6);
+marker6.setMap(map);
+var buenos = "Buenos Aires";
+var infoWindowOptions6 = {
+content: buenos
+};
+var infoWindow6 = new google.maps.InfoWindow(infoWindowOptions6);
+google.maps.event.addListener(marker6,'click',function(e){
+infoWindow6.open(map, marker6);
+setTimeout(function () { infoWindow6.close(); }, 3000);
+});
+// Chicago Marker
+var markerOptions7 = {
+position: new google.maps.LatLng(41.8369, -87.6847),
+map: map
+};
+var marker7 = new google.maps.Marker(markerOptions7);
+marker7.setMap(map);
+var chicago = "Chicago";
+var infoWindowOptions7 = {
+content: chicago
+};
+var infoWindow7 = new google.maps.InfoWindow(infoWindowOptions7);
+google.maps.event.addListener(marker7,'click',function(e){
+infoWindow7.open(map, marker7);
+setTimeout(function () { infoWindow7.close(); }, 3000);
+});
+// Dhaka Marker
+var markerOptions8 = {
+position: new google.maps.LatLng(23.7000, 90.3750),
+map: map
+};
+var marker8 = new google.maps.Marker(markerOptions8);
+marker8.setMap(map);
+var dhaka = "Dhaka";
+var infoWindowOptions8 = {
+content: dhaka
+};
+var infoWindow8 = new google.maps.InfoWindow(infoWindowOptions8);
+google.maps.event.addListener(marker8,'click',function(e){
+infoWindow8.open(map, marker8);
+setTimeout(function () { infoWindow8.close(); }, 3000);
+});
+// Instabul Marker
+var markerOptions9 = {
+position: new google.maps.LatLng(41.0136, 28.9550),
+map: map
+};
+var marker9 = new google.maps.Marker(markerOptions9);
+marker9.setMap(map);
+var istanbul = "Istanbul";
+var infoWindowOptions9 = {
+content: istanbul
+};
+var infoWindow9 = new google.maps.InfoWindow(infoWindowOptions9);
+google.maps.event.addListener(marker9,'click',function(e){
+infoWindow9.open(map, marker9);
+setTimeout(function () { infoWindow9.close(); }, 3000);
+});
+// Baghdad Marker
+var markerOptions10 = {
+position: new google.maps.LatLng(33.3250, 44.4220),
+map: map
+};
+var marker10 = new google.maps.Marker(markerOptions10);
+marker10.setMap(map);
+var baghdad = "Baghdad";
+var infoWindowOptions10 = {
+content: baghdad
+};
+var infoWindow10 = new google.maps.InfoWindow(infoWindowOptions10);
+google.maps.event.addListener(marker10,'click',function(e){
+infoWindow10.open(map, marker10);
+setTimeout(function () { infoWindow10.close(); }, 3000);
+});
+// Jakarta Marker
+var markerOptions11 = {
+position: new google.maps.LatLng(-6.2000, 106.8167),
+map: map
+};
+var marker11 = new google.maps.Marker(markerOptions11);
+marker11.setMap(map);
+var jakarta = "Jakarta";
+var infoWindowOptions11 = {
+content: jakarta
+};
+var infoWindow11 = new google.maps.InfoWindow(infoWindowOptions11);
+google.maps.event.addListener(marker11,'click',function(e){
+infoWindow11.open(map, marker11);
+setTimeout(function () { infoWindow11.close(); }, 3000);
+});
+// Tokyo Marker
+var markerOptions12 = {
+position: new google.maps.LatLng(35.6895, 139.6917),
+map: map
+};
+var marker12 = new google.maps.Marker(markerOptions12);
+marker12.setMap(map);
+var tokyo = "Tokyo";
+var infoWindowOptions12 = {
+content: tokyo
+};
+var infoWindow12 = new google.maps.InfoWindow(infoWindowOptions12);
+google.maps.event.addListener(marker12,'click',function(e){
+infoWindow12.open(map, marker12);
+setTimeout(function () { infoWindow12.close(); }, 3000);
+});
+rssfeedsetup();
+/*
+// Los Angeles Marker
+var markerOptions13 = {
+position: new google.maps.LatLng(34.0500, -118.2500),
+map: map
+};
+var marker13 = new google.maps.Marker(markerOptions13);
+marker13.setMap(map);
+var losan = "Los Angeles";
+var infoWindowOptions13 = {
+content: losan
+};
+console.log(feedcontainer.innerHTML);
+var infoWindow13 = new google.maps.InfoWindow(infoWindowOptions13);
+google.maps.event.addListener(marker13,'click',function(e){
+infoWindow13.open(map, marker13);
+setTimeout(function () { infoWindow13.close(); }, 3000);
+});
+*/
+// Manila Marker
+var markerOptions14 = {
+position: new google.maps.LatLng(14.5833, 120.9667),
+map: map
+};
+var marker14 = new google.maps.Marker(markerOptions14);
+marker14.setMap(map);
+var manila = "Manila";
+var infoWindowOptions14 = {
+content: manila
+};
+var infoWindow14 = new google.maps.InfoWindow(infoWindowOptions14);
+google.maps.event.addListener(marker14,'click',function(e){
+infoWindow14.open(map, marker14);
+setTimeout(function () { infoWindow14.close(); }, 3000);
+});
+// Miami Marker
+var markerOptions15 = {
+position: new google.maps.LatLng(25.7877, -80.2241),
+map: map
+};
+var marker15 = new google.maps.Marker(markerOptions15);
+marker15.setMap(map);
+var miami = "Miami";
+var infoWindowOptions15 = {
+content: miami
+};
+var infoWindow15 = new google.maps.InfoWindow(infoWindowOptions15);
+google.maps.event.addListener(marker15,'click',function(e){
+infoWindow15.open(map, marker15);
+setTimeout(function () { infoWindow15.close(); }, 3000);
+});
+// New York Marker
+var markerOptions16 = {
+position: new google.maps.LatLng(40.7127, -74.0059),
+map: map
+};
+var marker16 = new google.maps.Marker(markerOptions16);
+marker16.setMap(map);
+var nyc = "New York";
+var infoWindowOptions16 = {
+content: nyc
+};
+var infoWindow16 = new google.maps.InfoWindow(infoWindowOptions16);
+google.maps.event.addListener(marker16,'click',function(e){
+infoWindow16.open(map, marker16);
+setTimeout(function () { infoWindow16.close(); }, 3000);
+});
+// New York Marker
+var markerOptions16 = {
+position: new google.maps.LatLng(40.7127, -74.0059),
+map: map
+};
+var marker16 = new google.maps.Marker(markerOptions16);
+marker16.setMap(map);
+var nyc = "New York";
+var infoWindowOptions16 = {
+content: nyc
+};
+var infoWindow16 = new google.maps.InfoWindow(infoWindowOptions16);
+google.maps.event.addListener(marker16,'click',function(e){
+infoWindow16.open(map, marker16);
+setTimeout(function () { infoWindow16.close(); }, 3000);
+});
+// Shanghai Marker
+var markerOptions17 = {
+position: new google.maps.LatLng(31.2000, 121.5000),
+map: map
+};
+var marker17 = new google.maps.Marker(markerOptions17);
+marker17.setMap(map);
+var shanghai = "Shanghai";
+var infoWindowOptions17 = {
+content: shanghai
+};
+var infoWindow17 = new google.maps.InfoWindow(infoWindowOptions17);
+google.maps.event.addListener(marker17,'click',function(e){
+infoWindow17.open(map, marker17);
+setTimeout(function () { infoWindow17.close(); }, 3000);
+});
+// Singapore Marker
+var markerOptions18 = {
+position: new google.maps.LatLng(1.3000, 103.8000),
+map: map
+};
+var marker18 = new google.maps.Marker(markerOptions18);
+marker18.setMap(map);
+var sing = "Singapore";
+var infoWindowOptions18 = {
+content: sing
+};
+var infoWindow18 = new google.maps.InfoWindow(infoWindowOptions18);
+google.maps.event.addListener(marker18,'click',function(e){
+infoWindow18.open(map, marker18);
+setTimeout(function () { infoWindow18.close(); }, 3000);
+});
+// Hong Kong Marker
+var markerOptions19 = {
+position: new google.maps.LatLng(22.2670, 114.1880),
+map: map
+};
+var marker19 = new google.maps.Marker(markerOptions19);
+marker19.setMap(map);
+var hk = "Hong Kong";
+var infoWindowOptions19 = {
+content: hk
+};
+var infoWindow19 = new google.maps.InfoWindow(infoWindowOptions19);
+google.maps.event.addListener(marker19,'click',function(e){
+infoWindow19.open(map, marker19);
+setTimeout(function () { infoWindow19.close(); }, 3000);
+});
+// Detroit Marker
+var markerOptions20 = {
+position: new google.maps.LatLng(42.3314, -83.0458),
+map: map
+};
+var marker20 = new google.maps.Marker(markerOptions20);
+marker20.setMap(map);
+var detroit = "Detroit";
+var infoWindowOptions20 = {
+content: detroit
+};
+var infoWindow20 = new google.maps.InfoWindow(infoWindowOptions20);
+google.maps.event.addListener(marker20,'click',function(e){
+infoWindow20.open(map, marker20);
+setTimeout(function () { infoWindow20.close(); }, 3000);
+});
+// Moscow Marker
+var markerOptions21 = {
+position: new google.maps.LatLng(55.7500, 37.6167),
+map: map
+};
+var marker21 = new google.maps.Marker(markerOptions21);
+marker21.setMap(map);
+var moscow = "Moscow";
+var infoWindowOptions21 = {
+content: moscow
+};
+var infoWindow21 = new google.maps.InfoWindow(infoWindowOptions21);
+google.maps.event.addListener(marker21,'click',function(e){
+infoWindow21.open(map, marker21);
+setTimeout(function () { infoWindow21.close(); }, 3000);
+});
+// Bangkok Marker
+var markerOptions22 = {
+position: new google.maps.LatLng(13.7500, 100.4667),
+map: map
+};
+var marker22 = new google.maps.Marker(markerOptions22);
+marker22.setMap(map);
+var bangkok = "Bangkok";
+var infoWindowOptions22 = {
+content: bangkok
+};
+var infoWindow22 = new google.maps.InfoWindow(infoWindowOptions22);
+google.maps.event.addListener(marker22,'click',function(e){
+infoWindow22.open(map, marker22);
+setTimeout(function () { infoWindow22.close(); }, 3000);
+});
+// Paris Marker
+var markerOptions23 = {
+position: new google.maps.LatLng(48.8567, 2.3508),
+map: map
+};
+var marker23 = new google.maps.Marker(markerOptions23);
+marker23.setMap(map);
+var paris = "Paris";
+var infoWindowOptions23 = {
+content: paris
+};
+var infoWindow23 = new google.maps.InfoWindow(infoWindowOptions23);
+google.maps.event.addListener(marker23,'click',function(e){
+infoWindow23.open(map, marker23);
+setTimeout(function () { infoWindow23.close(); }, 3000);
+})
+// Toronto Marker
+var markerOptions24 = {
+position: new google.maps.LatLng(43.7000, -79.4000),
+map: map
+};
+var marker24 = new google.maps.Marker(markerOptions24);
+marker24.setMap(map);
+var toront = "Toronto";
+var infoWindowOptions24 = {
+content: toront
+};
+var infoWindow24 = new google.maps.InfoWindow(infoWindowOptions24);
+google.maps.event.addListener(marker24,'click',function(e){
+infoWindow24.open(map, marker24);
+setTimeout(function () { infoWindow24.close(); }, 3000);
+})
+// Seattle Marker
+var markerOptions25 = {
+position: new google.maps.LatLng(47.6097, -122.3331),
+map: map
+};
+var marker25 = new google.maps.Marker(markerOptions25);
+marker25.setMap(map);
+var seat = "Seattle";
+var infoWindowOptions25 = {
+content: seat
+};
+var infoWindow25 = new google.maps.InfoWindow(infoWindowOptions25);
+google.maps.event.addListener(marker25,'click',function(e){
+infoWindow25.open(map, marker25);
+setTimeout(function () { infoWindow25.close(); }, 3000);
+})
+// DC Marker
+var markerOptions26 = {
+position: new google.maps.LatLng(38.8951, -77.0367),
+map: map
+};
+var marker26 = new google.maps.Marker(markerOptions26);
+marker26.setMap(map);
+var dc = "Washington D.C.";
+var infoWindowOptions26 = {
+content: dc
+};
+var infoWindow26 = new google.maps.InfoWindow(infoWindowOptions26);
+google.maps.event.addListener(marker26,'click',function(e){
+infoWindow26.open(map, marker26);
+setTimeout(function () { infoWindow26.close(); }, 3000);
+})
+// Denver Marker
+var markerOptions27 = {
+position: new google.maps.LatLng(39.7392, -104.9847),
+map: map
+};
+var marker27 = new google.maps.Marker(markerOptions27);
+marker27.setMap(map);
+var denver = "Denver";
+var infoWindowOptions27 = {
+content: denver
+};
+var infoWindow27 = new google.maps.InfoWindow(infoWindowOptions27);
+google.maps.event.addListener(marker27,'click',function(e){
+infoWindow27.open(map, marker27);
+setTimeout(function () { infoWindow27.close(); }, 3000);
+})
+// San Diego Marker
+var markerOptions28 = {
+position: new google.maps.LatLng(32.7150, -117.1625),
+map: map
+};
+var marker28 = new google.maps.Marker(markerOptions28);
+marker28.setMap(map);
+var sd = "San Diego";
+var infoWindowOptions28 = {
+content: sd
+};
+var infoWindow28 = new google.maps.InfoWindow(infoWindowOptions28);
+google.maps.event.addListener(marker28,'click',function(e){
+infoWindow28.open(map, marker28);
+setTimeout(function () { infoWindow28.close(); }, 3000);
+})
+// Philadelphia Marker
+var markerOptions29 = {
+position: new google.maps.LatLng(39.9500, -75.1667),
+map: map
+};
+var marker29 = new google.maps.Marker(markerOptions29);
+marker29.setMap(map);
+var philly = "Philadelphia";
+var infoWindowOptions29 = {
+content: philly
+};
+var infoWindow29 = new google.maps.InfoWindow(infoWindowOptions29);
+google.maps.event.addListener(marker29,'click',function(e){
+infoWindow29.open(map, marker29);
+setTimeout(function () { infoWindow29.close(); }, 3000);
+})
+// Berlin Marker
+var markerOptions30 = {
+position: new google.maps.LatLng(52.5167, 13.3833),
+map: map
+};
+var marker30 = new google.maps.Marker(markerOptions30);
+marker30.setMap(map);
+var berlin = "Berlin";
+var infoWindowOptions30 = {
+content: berlin
+};
+var infoWindow30 = new google.maps.InfoWindow(infoWindowOptions30);
+google.maps.event.addListener(marker30,'click',function(e){
+infoWindow30.open(map, marker30);
+setTimeout(function () { infoWindow30.close(); }, 3000);
+})
+// New Delhi Marker
+var markerOptions31 = {
+position: new google.maps.LatLng(28.6139, 77.2089),
+map: map
+};
+var marker31 = new google.maps.Marker(markerOptions31);
+marker31.setMap(map);
+var nd = "New Delhi";
+var infoWindowOptions31 = {
+content: nd
+};
+var infoWindow31 = new google.maps.InfoWindow(infoWindowOptions31);
+google.maps.event.addListener(marker31,'click',function(e){
+infoWindow31.open(map, marker31);
+setTimeout(function () { infoWindow31.close(); }, 3000);
+})
+// Rio De Janeiro Marker
+var markerOptions32 = {
+position: new google.maps.LatLng(-22.9083, -43.1964),
+map: map
+};
+var marker32 = new google.maps.Marker(markerOptions32);
+marker32.setMap(map);
+var rio = "Rio De Janeiro";
+var infoWindowOptions32 = {
+content: rio
+};
+var infoWindow32 = new google.maps.InfoWindow(infoWindowOptions32);
+google.maps.event.addListener(marker32,'click',function(e){
+infoWindow32.open(map, marker32);
+setTimeout(function () { infoWindow32.close(); }, 3000);
+})
+// Santiago Marker
+var markerOptions33 = {
+position: new google.maps.LatLng(-33.4500, -70.6667),
+map: map
+};
+var marker33 = new google.maps.Marker(markerOptions33);
+marker33.setMap(map);
+var sant = "Santiago";
+var infoWindowOptions33 = {
+content: sant
+};
+var infoWindow33 = new google.maps.InfoWindow(infoWindowOptions33);
+google.maps.event.addListener(marker33,'click',function(e){
+infoWindow33.open(map, marker33);
+setTimeout(function () { infoWindow33.close(); }, 3000);
+})
+// Bogota Marker
+var markerOptions34 = {
+position: new google.maps.LatLng(4.5981, -74.0758),
+map: map
+};
+var marker34 = new google.maps.Marker(markerOptions34);
+marker34.setMap(map);
+var bogota = "Bogota";
+var infoWindowOptions34 = {
+content: bogota
+};
+var infoWindow34 = new google.maps.InfoWindow(infoWindowOptions34);
+google.maps.event.addListener(marker34,'click',function(e){
+infoWindow34.open(map, marker34);
+setTimeout(function () { infoWindow34.close(); }, 3000);
+})
+// Lima Marker
+var markerOptions35 = {
+position: new google.maps.LatLng(-12.0433, -77.0283),
+map: map
+};
+var marker35 = new google.maps.Marker(markerOptions35);
+marker35.setMap(map);
+var lima = "Lima";
+var infoWindowOptions35 = {
+content: lima
+};
+var infoWindow35 = new google.maps.InfoWindow(infoWindowOptions35);
+google.maps.event.addListener(marker35,'click',function(e){
+infoWindow35.open(map, marker35);
+setTimeout(function () { infoWindow35.close(); }, 3000);
+})
+// Cape Town Marker
+var markerOptions36 = {
+position: new google.maps.LatLng(-33.9253, 18.4239),
+map: map
+};
+var marker36 = new google.maps.Marker(markerOptions36);
+marker36.setMap(map);
+var ct = "Cape Town";
+var infoWindowOptions36 = {
+content: ct
+};
+var infoWindow36 = new google.maps.InfoWindow(infoWindowOptions36);
+google.maps.event.addListener(marker36,'click',function(e){
+infoWindow36.open(map, marker36);
+setTimeout(function () { infoWindow36.close(); }, 3000);
+})
+// Madrid Marker
+var markerOptions37 = {
+position: new google.maps.LatLng(40.4000, -3.6833),
+map: map
+};
+var marker37 = new google.maps.Marker(markerOptions37);
+marker37.setMap(map);
+var mad = "Madrid";
+var infoWindowOptions37 = {
+content: mad
+};
+var infoWindow37 = new google.maps.InfoWindow(infoWindowOptions37);
+google.maps.event.addListener(marker37,'click',function(e){
+infoWindow37.open(map, marker37);
+setTimeout(function () { infoWindow37.close(); }, 3000);
+})
+// Seoul Marker
+var markerOptions38 = {
+position: new google.maps.LatLng(37.5667, 126.9781),
+map: map
+};
+var marker38 = new google.maps.Marker(markerOptions38);
+marker38.setMap(map);
+var seoul = "Seoul";
+var infoWindowOptions38 = {
+content: seoul
+};
+var infoWindow38 = new google.maps.InfoWindow(infoWindowOptions38);
+google.maps.event.addListener(marker38,'click',function(e){
+infoWindow38.open(map, marker38);
+setTimeout(function () { infoWindow38.close(); }, 3000);
+})
+// Taipei Marker
+var markerOptions39 = {
+position: new google.maps.LatLng(25.0333, 121.6333),
+map: map
+};
+var marker39 = new google.maps.Marker(markerOptions39);
+marker39.setMap(map);
+var taipei = "Taipei";
+var infoWindowOptions39 = {
+content: taipei
+};
+var infoWindow39 = new google.maps.InfoWindow(infoWindowOptions39);
+google.maps.event.addListener(marker39,'click',function(e){
+infoWindow39.open(map, marker39);
+setTimeout(function () { infoWindow39.close(); }, 3000);
+})
+// Taipei Marker
+var markerOptions39 = {
+position: new google.maps.LatLng(25.0333, 121.6333),
+map: map
+};
+var marker39 = new google.maps.Marker(markerOptions39);
+marker39.setMap(map);
+var taipei = "Taipei";
+var infoWindowOptions39 = {
+content: taipei
+};
+var infoWindow39 = new google.maps.InfoWindow(infoWindowOptions39);
+google.maps.event.addListener(marker39,'click',function(e){
+infoWindow39.open(map, marker39);
+setTimeout(function () { infoWindow39.close(); }, 3000);
+setTimeout(function () { infoWindow40.close(); }, 3000);
+})
+};
+setTimeout(initialize, 1000 );
+google.maps.event.addDomListener(window, 'load');
+</script>
+</div>
+</div>
+<body>
+<div id="map-canvas"></div>
+</body>
+</html>
