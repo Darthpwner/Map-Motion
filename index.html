@@ -6,14 +6,63 @@
     <meta charset="utf-8">
     <link rel="shortcut icon" href="../favicon.ico">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
     <style>
       html, body, #map-canvas {
         margin: 0;
         font-family: 'Open Sans', sans-serif;
         padding: 0;
-        height: 95%;
+        height: 100%;
       }
+      footer{
+        position: absolute;
+        bottom: 0px;
+        right: 15px;
+        padding-bottom: 1em;
+        text-align: right;
+        color: #727378;
+        font-size: 1.1em;
+      }
+      h1{
+        font-size: 50px;
+      }
+
+      #map-canvas{
+        display: none;
+
+      }
+
+      ul{
+        width: 200px;
+        display: none;
+      }
+
+      #gmicon{
+        height:250px;
+        visibility: hidden;
+      }
+
+      p{
+
+        padding-bottom:50px;
+      }
+
+      #continue{
+        font-size:30px;
+      }
+
+      #plusicon{
+        padding-left: 50px;
+        padding-bottom: 60px;
+        padding-right: 50px;
+        visibility: hidden;
+      }
+
+      #lmicon{
+        height: 250px;
+        visibility: hidden;
+      }
+
       h2{
 
         padding-left: 15px;
@@ -57,6 +106,10 @@
         width: 100%;
         margin: 5px 0 0 0;
       }
+      
+      #interests {
+        display: none;
+      }
     </style>
 
  		<script type="text/javascript" src="http://www.google.com/jsapi?"></script>
@@ -68,8 +121,11 @@
 		<div id="container" style="width: 1370px; height: auto;">
 			<div style="background-color: white; width: auto; height: 0px; float: top; background: linear-gradient(black, ‪#‎2D2B2B‬)">
 				<span style="font-size: 30px; color: ‪black ;margin-left: 0px; margin-top: 0px; margin-bottom: 0px;"></span>
-                <div style="text-align: center; padding-top: 50px;">
-                    <img src="https://github.com/Darthpwner/Map-Motion/blob/gh-pages/Map-Motion-Logo.png?raw=true"/>
+                <div style="text-align: center; padding-top: 25px;">
+                    <h1>Map Motion</h1>
+                    <h2>Leap Motion meets Google Maps. In the most feature-rich way possible.</h2>
+                    <p><img id="gmicon" src="googlemapsicon.png"/><img id="plusicon" src="plus.png"/><img id="lmicon" src="leapmotion.jpg"/></p>
+                    <button onclick="showApp()" class="pure-button pure-button-primary" id="continue">Continue</button>
                 </div>
             </div>
         </div>
@@ -79,12 +135,21 @@
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/velocity/1.2.2/velocity.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
     <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
     <script src="https://js.leapmotion.com/leap-plugins-0.1.10.js"></script>
     <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>    
 
     <script>
+//alert("sd");
+//$('#gmicon').delay(800).fadeIn(400);
+ // $('#plusicon').delay(1200).fadeIn(400);
+  //$('#lmicon').delay(1400).fadeIn(400);
+
+$('#gmicon').css('visibility','visible').hide().delay(800).fadeIn('slow');
+$('#plusicon').css('visibility','visible').hide().delay(1600).fadeIn('slow');
+$('#lmicon').css('visibility','visible').hide().delay(2400).fadeIn('slow');
 
 var map;
 var placesList;
@@ -104,6 +169,7 @@ var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
 
+var pointsOfInterestOrigins = [];
 
 var lookupClickedLastFrame = 0;
 
@@ -123,7 +189,6 @@ function palmPosition(hand) {
 function move(frame) {
     
     var panorama;
-    
         
     // This is to catch a bug somewhere that causes the StreetView to not be visible
     panorama = map.getStreetView();
@@ -133,9 +198,17 @@ function move(frame) {
         return;
     }
        
-    if (streetView === false && frame.id > streetViewFrameStart + 50) {
+    if (streetView === false) {
         // Look for any circle gestures and process the zoom
         // TODO: filter out multiple circle gestures per frame
+        
+        markHands(frame);
+        
+        // This creates a delay between returning from streetViews and gestures so they don't overlap.
+        if (frame.id < streetViewFrameStart + 60) {
+            return;
+        }
+        
         if(frame.valid && frame.gestures.length > 0){
             frame.gestures.forEach(function(gesture){
                 filterGesture("circle", zoom)(frame, gesture);
@@ -144,12 +217,11 @@ function move(frame) {
                 filterGesture("swipe", switchMode)(frame, gesture);
             });
         }
-        markHands(frame);
         
         // Get points of interest by pointing both palms downward while viewing the map (not StreetView)
         if (frame.hands.length === 2 && frame.id > lookupClickedLastFrame + 50) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
-                document.getElementById("lookup").click();
+                showNearByPOI();
                 lookupClickedLastFrame = frame.id;
                 return;
             }
@@ -165,11 +237,9 @@ function move(frame) {
                 var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
                 var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
                 panorama = map.getStreetView();
-                map.set('streetViewControl', true);
                 panorama.setPosition(myLatlng);
                 panorama.setVisible(true);
                 streetView = true;
-                streetViewFrameStart = frame.id;
                 return;
             }
         }
@@ -244,10 +314,10 @@ function move(frame) {
         // Two palms down to exit StreetView and return to map.
         if (frame.hands.length === 2 && streetView === true) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
-                map.set('streetViewControl', false);
                 panorama = map.getStreetView();
                 panorama.setVisible(false);
                 streetView = false;
+                streetViewFrameStart = frame.id;
                 return;
             }
         }
@@ -565,6 +635,13 @@ function createMarkers(places) {
   map.fitBounds(bounds);
 }
 
+function showApp(){
+  $('#container').fadeOut('fast');
+  $('#map-canvas').fadeIn('fast');
+  setTimeout(initialize, 100 );
+
+}
+
 function showNearByPOI(){
   /*
   var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
@@ -575,6 +652,21 @@ function showNearByPOI(){
   var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
   */
   var myOrigin = map.getCenter();
+  var origin;
+  var distance;
+  
+  for (var i = 0; i < pointsOfInterestOrigins.length; i++) {
+    origin = pointsOfInterestOrigins[i];
+    distance = google.maps.geometry.spherical.computeDistanceBetween(myOrigin, origin);
+    if (distance < 500) {
+        console.log("Too close.");
+        return;
+    }
+  }
+  
+  pointsOfInterestOrigins.push(myOrigin);
+  
+  
   var request = {
     location: myOrigin,
     radius: 500,
@@ -609,6 +701,9 @@ function initialize() {
   // Get rid of splash screen
   var splashScreen = document.getElementById('container');
   splashScreen.style.display = 'none';
+  
+  var interests =  document.getElementById('interests');
+  //interests.style.display = 'initial';
 
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
   var myOrigin = new google.maps.LatLng(34.0737354, -118.4455506);
@@ -671,58 +766,91 @@ function isClockwise(frame, gesture) {
 }
 
 
-
-setTimeout(initialize, 1500 );
 google.maps.event.addDomListener(window, 'load');
+
+
     </script>
       </div>
       </div> 
   	<body>
-        	<div id="map-canvas"></div>
-        <div id="results">
-          <h2>Results</h2>
-          <ul id="places"></ul>
-          <button id="more">More results</button>
-        </div>
-        <form method="get" action="http://www.google.com/search">
-         <input type="text" name="q" size="30" x-webkit-speech />
-         <input type="submit" value="Search" />
-        </form>
-        <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
-        <div>
-          <ul>
+        <ul>
+                <h2>Basic Movement</h2>
+                <li>Grab the map with one hand to pan around.</li>
+                <li>Draw a clockwise circle with your index finger to zoom in.</li>
+                <li>Draw a counter-clockwise circle with your index finger to zoom out.</li>
+                <li>&nbsp;</li>
 
-            <h2>Basic Movement</h2>
-            <li>Grab the map with one hand to pan around.</li>
-            <li>Draw a clockwise circle with your index finger to zoom in.</li>
-            <li>Draw a counter-clockwise circle with your index finger to zoom out.</li>
-            <li>&nbsp;</li>
+                <h2>Streetview</h2>
 
-            <h2>Streetview</h2>
+                <li>Palm up to enter streetview wherever your focus is.</li>
+                <li>Swipe up and down to go forward and backwards, respectively.</li>
+                <li>Palm down with both hands to exit streetview.</li>
+                <li>&nbsp;</li>
 
-            <li>Palm up to enter streetview whereever your focus is.</li>
-            <li>Swipe up and down to go forward and backwards, respectively.</li>
-            <li>Palm down with both hands to exit streetview.</li>
-            <li>&nbsp;</li>
+                <h2>Points of Interests</h2>
 
-            <h2>Points of Interests</h2>
+                <li>Palm down with both hands to show all points of interest near your focus.</li>
+                <li>&nbsp;</li>
+                
+                <h2>Directions</h2>
 
-            <li>Palm down with both hands to show all points of interest near your focus.</li>
-            <li>&nbsp;</li>
+                <li>Tap to place the starting location</li>
+                <li>Tap once more, somewhere else, to place the end location. The shortest path between the two markers should come up.</li>
+                <li>Tap again, as many as you want, to place waypoints between the path.</li>
+                <li>Poke the screen to clear all dropped markers.</li>
+                <li>&nbsp;</li>
+
+                <h2>Menu</h2>
+                <li>Clap to bring up the menu.</li>
+                <li>&nbsp;</li>
+            </ul>
+        <div id="map-canvas"></div>
             
-            <h2>Directions</h2>
+        <div id="interests">
+            <div id="results">
+                <h2>Results</h2>
+                <ul id="places"></ul>
+                <button id="more">More results</button>
+            </div>
+            <form method="get" action="http://www.google.com/search">
+                 <input type="text" name="q" size="30" x-webkit-speech />
+                 <input type="submit" value="Search" />
+            </form>
+            <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
+            <ul>
+                <h2>Basic Movement</h2>
+                <li>Grab the map with one hand to pan around.</li>
+                <li>Draw a clockwise circle with your index finger to zoom in.</li>
+                <li>Draw a counter-clockwise circle with your index finger to zoom out.</li>
+                <li>&nbsp;</li>
 
-            <li>Tap to place the starting location</li>
-            <li>Tap once more, somewhere else, to place the end location. The shortest path between the two markers should come up.</li>
-            <li>Tap again, as many as you want, to place waypoints between the path.</li>
-            <li>Poke the screen to clear all dropped markers.</li>
-            <li>&nbsp;</li>
+                <h2>Streetview</h2>
 
-            <h2>Menu</h2>
-            <li>Clap to bring up the menu.</li>
-            <li>&nbsp;</li>
-          </ul>
+                <li>Palm up to enter streetview wherever your focus is.</li>
+                <li>Swipe up and down to go forward and backwards, respectively.</li>
+                <li>Palm down with both hands to exit streetview.</li>
+                <li>&nbsp;</li>
 
+                <h2>Points of Interests</h2>
+
+                <li>Palm down with both hands to show all points of interest near your focus.</li>
+                <li>&nbsp;</li>
+                
+                <h2>Directions</h2>
+
+                <li>Tap to place the starting location</li>
+                <li>Tap once more, somewhere else, to place the end location. The shortest path between the two markers should come up.</li>
+                <li>Tap again, as many as you want, to place waypoints between the path.</li>
+                <li>Poke the screen to clear all dropped markers.</li>
+                <li>&nbsp;</li>
+
+                <h2>Menu</h2>
+                <li>Clap to bring up the menu.</li>
+                <li>&nbsp;</li>
+            </ul>
         </div>
     </body>
+    <footer>
+      Map Motion © 2015
+    </footer>
 </html>
