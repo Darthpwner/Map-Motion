@@ -228,7 +228,7 @@ function move(frame) {
         }        
     
         // Palm up to activate StreetView.  Two palms down to go back to map.
-        if (frame.hands.length == 1 && streetView === false) {
+        if ((frame.hands.length === 1) && (streetView === false) && (isGripped(frame.hands[0]) === false)) {         
             if (palmPosition(frame.hands[0]) == "up") {
                 var hand = frame.hands[0];
                 var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
