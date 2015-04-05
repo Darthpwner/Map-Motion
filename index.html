@@ -62,6 +62,52 @@
       #interests {
         display: none;
       }
+
+      #popUpDiv{
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        margin-top: 8%;
+        width: 700px;
+        height: 400px;
+        background-color: white;
+        border-style: solid;
+        border-width: 2px;
+        z-index: 2;
+        visibility: hidden;
+      }
+      
+      #opac{    
+        position: absolute;
+        top: -10px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border-style: solid;
+        border-width: 2px;
+        background-color: black;
+        height: 86.5%;
+        z-index: 1;
+        opacity: 0.75;
+        visibility: hidden;
+      }
+
+      #menu{
+        position: relative;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+        margin: auto;
+        margin-top: 5%;
+        width: 200px;
+        height: 100px;
+        z-index: 3; 
+      }
     </style>
 
  		<script type="text/javascript" src="http://www.google.com/jsapi?"></script>
@@ -106,6 +152,7 @@ var MAX_ZOOM = 22;
 var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
+var ayMenu = false;
 
 var pointsOfInterestOrigins = [];
 
@@ -127,7 +174,7 @@ function palmPosition(hand) {
 function move(frame) {
     
     var panorama;
-        
+
     // This is to catch a bug somewhere that causes the StreetView to not be visible
     panorama = map.getStreetView();
     if (panorama.getVisible() === false && streetView === true) {
@@ -136,12 +183,12 @@ function move(frame) {
         return;
     }
        
-    if (streetView === false) {
+
+    if (streetView === false && ayMenu === false) {
         // Look for any circle gestures and process the zoom
         // TODO: filter out multiple circle gestures per frame
         
         markHands(frame);
-        
         // This creates a delay between returning from streetViews and gestures so they don't overlap.
         if (frame.id < streetViewFrameStart + 60) {
             return;
@@ -248,7 +295,7 @@ function move(frame) {
         }
     }
     
-    else if (streetView === true) {
+    else if (streetView === true && ayMenu === false) {
         // Two palms down to exit StreetView and return to map.
         if (frame.hands.length === 2 && streetView === true) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
@@ -268,7 +315,7 @@ function move(frame) {
         }
     }
 
-
+menuOpen(frame);
   
 }
 var handMarkers = [];
@@ -312,6 +359,31 @@ function markHands(frame) {
           }
       }
 }
+
+function menuOpen(frame){
+ 
+    if(frame.hands.length > 1){
+        var ppx = Math.abs(frame.hands[0].palmPosition[0]) + Math.abs(frame.hands[1].palmPosition[0]);
+        var ppy = Math.abs(frame.hands[0].palmPosition[1]) + Math.abs(frame.hands[1].palmPosition[1]);
+
+        if( ppx < 50 && (300 < ppy < 350)){
+            document.getElementById("opac").style.visibility = 'visible';
+            document.getElementById("popUpDiv").style.visibility = 'visible';
+            }
+        }
+
+    if(frame.hands.length > 0){
+      var tip = frame.hands[0].pointables[0].tipPosition[0];
+
+      console.log(tip);
+      if(isGripped(frame.hands[0]) && tip < -105){
+          document.getElementById("opac").style.visibility = 'hidden';ayMenu = false
+          document.getElementById("popUpDiv").style.visibility = 'hidden';
+        }
+      }
+    
+  }
+  
 
 function calcRoute() {
   //alert(start);
@@ -709,6 +781,13 @@ google.maps.event.addDomListener(window, 'load');
       </div>
       </div> 
   	<body>
+        <div id="opac"></div>
+          <div id="popUpDiv">
+            <div id="menu">
+              <h1>MENU</h1>
+          </div>
+        </div> 
+
         <div id="map-canvas"></div>
             
         <div id="interests">
