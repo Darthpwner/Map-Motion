@@ -15,6 +15,10 @@
         height: 95%;
       }
 
+      canvas{
+        pointer-events: none;
+      }
+
       h2{
 
         padding-left: 15px;
@@ -41,10 +45,6 @@
       ul {
         list-style-type: none;
         padding: 0;
-<<<<<<< HEAD
-        height: 98%;
-        z-index: 0;
-=======
         margin: 0;
         overflow-y: scroll;
       }
@@ -62,59 +62,6 @@
         width: 100%;
         margin: 5px 0 0 0;
       }
-      
-      #interests {
-        display: none;
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
-      }
-
-      #popUpDiv{
-      	position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        margin: auto;
-        margin-top: 11%;
-        width: 700px;
-        height: 400px;
-        background-color: white;
-        border-style: solid;
-        border-width: 2px;
-        z-index: 2;
-        visibility: hidden;
-      }
-      
-      #opac{    
-      	position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        margin: auto;
-        border-style: solid;
-        border-width: 2px;
-      	background-color: black;
-        height: 98%;
-      	z-index: 1;
-      	opacity: 0.75;
-      	visibility: hidden;
-      }
-
-      #menu{
-      	position: relative;
-      	top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        text-align: center;
-        margin: auto;
-        margin-top: 5%;
-        width: 200px;
-        height: 100px;
-        z-index: 3;	
-      }
-
     </style>
 
  		<script type="text/javascript" src="http://www.google.com/jsapi?"></script>
@@ -136,12 +83,20 @@
 
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
-    <script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script>
-    <script src="https://js.leapmotion.com/leap-plugins-0.1.6.js"></script>
-    <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
+    <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+    <script src="https://js.leapmotion.com/leap-plugins-0.1.10.js"></script>
+    <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>    
 
+    <script>
+(window.controller = new Leap.Controller)
+    .use('riggedHand', {
+      boneLabels: function(boneMesh, leapHand) {
+        return boneMesh.name
+      }
+  })
+    .connect()
 var map;
 var placesList;
 var service;
@@ -160,53 +115,6 @@ var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
 
-<<<<<<< HEAD
-function move(frame) {
-
-	if(frame.hands.length > 1 ){
-		if(isGripped(frame.hands[0]) && isGripped(frame.hands[1])){
-			document.getElementById("opac").style.visibility = 'hidden';
-			document.getElementById("popUpDiv").style.visibility = 'hidden';
-		}
-	}
-
-    // Look for any circle gestures and process the zoom
-    // TODO: filter out multiple circle gestures per frame
-    if(frame.valid && frame.gestures.length > 0){
-        frame.gestures.forEach(function(gesture){
-            filterGesture("circle", zoom)(frame, gesture);
-            filterGesture("keyTap", dropPin)(frame, gesture);
-            filterGesture("swipe", switchMode)(frame, gesture);
-        });
-    }
-    markHands(frame);
-    menuOpen(frame);
-
-    // if there is one hand grabbing...
-    if(frame.hands.length > 0 && isGripped(frame.hands[LEFT_HAND])) {
-      var leftHand = frame.hands[LEFT_HAND];
-      var rightHand = frame.hands.length > 1 ? frame.hands[RIGHT_HAND] : undefined;
-      var separation;
-      
-      // If there was no previous closed position, capture it and exit
-      if(leftHandPrev == null) {
-        leftHandPrev = leftHand;
-        return;
-      }
-
-      // if there is a right hand and its gripped...
-      if(rightHand) {
-        if(isGripped(rightHand)) {
-          separation = Math.sqrt(
-                            Math.pow(rightHand.stabilizedPalmPosition[X] - leftHand.stabilizedPalmPosition[X], 2) + 
-                            Math.pow(rightHand.stabilizedPalmPosition[Y] - leftHand.stabilizedPalmPosition[Y], 2)
-                          );
-          // console.log("separation = " + separation + " ("+separationStart+")");
-          // ...and no previous separation, capture and exit
-          if(separationStart == null) {
-            separationStart = separation;
-=======
-var pointsOfInterestOrigins = [];
 
 var lookupClickedLastFrame = 0;
 
@@ -225,7 +133,7 @@ function palmPosition(hand) {
 
 function move(frame) {
     
-    var planorama;
+    var panorama;
     
         
     // This is to catch a bug somewhere that causes the StreetView to not be visible
@@ -236,17 +144,9 @@ function move(frame) {
         return;
     }
        
-    if (streetView === false) {
+    if (streetView === false && frame.id > streetViewFrameStart + 50) {
         // Look for any circle gestures and process the zoom
         // TODO: filter out multiple circle gestures per frame
-        
-        markHands(frame);
-        
-        // This creates a delay between returning from streetViews and gestures so they don't overlap.
-        if (frame.id < streetViewFrameStart + 60) {
-            return;
-        }
-        
         if(frame.valid && frame.gestures.length > 0){
             frame.gestures.forEach(function(gesture){
                 filterGesture("circle", zoom)(frame, gesture);
@@ -255,6 +155,7 @@ function move(frame) {
                 filterGesture("swipe", switchMode)(frame, gesture);
             });
         }
+        markHands(frame);
         
         // Get points of interest by pointing both palms downward while viewing the map (not StreetView)
         if (frame.hands.length === 2 && frame.id > lookupClickedLastFrame + 50) {
@@ -275,9 +176,11 @@ function move(frame) {
                 var origin = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getCenter().lng());
                 var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
                 panorama = map.getStreetView();
+                map.set('streetViewControl', true);
                 panorama.setPosition(myLatlng);
                 panorama.setVisible(true);
                 streetView = true;
+                streetViewFrameStart = frame.id;
                 return;
             }
         }
@@ -291,7 +194,6 @@ function move(frame) {
           // If there was no previous closed position, capture it and exit
           if(leftHandPrev == null) {
             leftHandPrev = leftHand;
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
             return;
           }
           // if there is a right hand and its gripped...
@@ -323,12 +225,6 @@ function move(frame) {
               separationStart = null;
             }
           }
-<<<<<<< HEAD
-        // If the right hand is not gripped...
-        } else if(separationStart != null) {
-          separationStart = null;
-
-=======
           // Calculate how much the hand moved
           var dX = leftHandPrev.stabilizedPalmPosition[X] - leftHand.stabilizedPalmPosition[X];
           var dY = leftHandPrev.stabilizedPalmPosition[Y] - leftHand.stabilizedPalmPosition[Y];
@@ -359,10 +255,10 @@ function move(frame) {
         // Two palms down to exit StreetView and return to map.
         if (frame.hands.length === 2 && streetView === true) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
+                map.set('streetViewControl', false);
                 panorama = map.getStreetView();
                 panorama.setVisible(false);
                 streetView = false;
-                streetViewFrameStart = frame.id;
                 return;
             }
         }
@@ -372,7 +268,6 @@ function move(frame) {
                 filterGesture("swipe", streetViewSwipe)(frame, gesture);
             });
             return;
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
         }
     }
 
@@ -382,7 +277,6 @@ function move(frame) {
 var handMarkers = [];
 var HEIGHT_OFFSET = 150;
 var BASE_MARKER_SIZE_GRIPPED = 350000, BASE_MARKER_SIZE_UNGRIPPED = 500000;
-
 function markHands(frame) {
     var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
       var bounds = map.getBounds();
@@ -422,17 +316,6 @@ function markHands(frame) {
       }
 }
 
-<<<<<<< HEAD
-function menuOpen(frame){
-	if(frame.hands.length == 2){
-		var r = frame.hands[1].stabilizedPalmPosition[0];
-		var l = frame.hands[0].stabilizedPalmPosition[0];
-		if(l < 30 && r > -30) { 
-			document.getElementById("opac").style.visibility = 'visible';
-			document.getElementById("popUpDiv").style.visibility = 'visible';
-		}
-	}
-=======
 function calcRoute() {
   //alert(start);
   //alert(end);
@@ -450,7 +333,6 @@ function calcRoute() {
     }
   });
   directionsDisplay.setMap(map);
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
 }
 
 function dropPin(frame, keyTapGesture){
@@ -652,8 +534,6 @@ function zoom(frame, circleGesture) {
     }
 }
 
-<<<<<<< HEAD
-=======
 function createMarkers(places) {
   var bounds = new google.maps.LatLngBounds();
 
@@ -706,21 +586,6 @@ function showNearByPOI(){
   var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
   */
   var myOrigin = map.getCenter();
-  var origin;
-  var distance;
-  
-  for (var i = 0; i < pointsOfInterestOrigins.length; i++) {
-    origin = pointsOfInterestOrigins[i];
-    distance = google.maps.geometry.spherical.computeDistanceBetween(myOrigin, origin);
-    if (distance < 500) {
-        console.log("Too close.");
-        return;
-    }
-  }
-  
-  pointsOfInterestOrigins.push(myOrigin);
-  
-  
   var request = {
     location: myOrigin,
     radius: 500,
@@ -750,15 +615,11 @@ function callback(results, status, pagination) {
   }
 }
 
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
 function initialize() {
     
   // Get rid of splash screen
   var splashScreen = document.getElementById('container');
   splashScreen.style.display = 'none';
-  
-  var interests =  document.getElementById('interests');
-  interests.style.display = 'initial';
 
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
   var myOrigin = new google.maps.LatLng(34.0737354, -118.4455506);
@@ -772,30 +633,19 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
   map.setTilt(45);
-<<<<<<< HEAD
-  
-=======
-  /*
-  var request = {
-    location: myOrigin,
-    radius: 500,
-    types: ['store']
-  };
 
-  placesList = document.getElementById('places');
-  infowindow = new google.maps.InfoWindow();
-  service = new google.maps.places.PlacesService(map);
-  service.nearbySearch(request, callback);
-  */
   placesList = document.getElementById('places');
   infowindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
   //showNearByPOI();
   directionsDisplay.setMap(map);
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
   // listen to Leap Motion
   Leap.loop({enableGestures: true}, move);
+
+
 }
+
+
 // ==== utility functions =====
 /** Returns the truth that a Leap Motion API Hand object is currently in a gripped or "grabbed" state.
 */
@@ -815,7 +665,6 @@ function getHandColor(hand) {
         return tint;
     }
 }
-
 function filterGesture(gestureType, callback) {
     return function(frame, gesture) {
         if(gesture.type == gestureType) {
@@ -832,71 +681,59 @@ function isClockwise(frame, gesture) {
     return clockwise;
 }
 
+
+
 setTimeout(initialize, 1500 );
 google.maps.event.addDomListener(window, 'load');
     </script>
-<<<<<<< HEAD
-  </head>
-  <body>
-  	<div id="opac"></div>
-  	<div id="popUpDiv">
-  		<div id="menu">
-  			<h1>MENU</h1>
-  		</div>
-    </div>	
-    <div id="map-canvas">
-    </div>
-    </body>
-  </body>
-=======
       </div>
       </div> 
   	<body>
-        <div id="map-canvas"></div>
+        	<div id="map-canvas"></div>
+        <div id="results">
+          <h2>Results</h2>
+          <ul id="places"></ul>
+          <button id="more">More results</button>
+        </div>
+        <form method="get" action="http://www.google.com/search">
+         <input type="text" name="q" size="30" x-webkit-speech />
+         <input type="submit" value="Search" />
+        </form>
+        <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
+        <div>
+          <ul>
+
+            <h2>Basic Movement</h2>
+            <li>Grab the map with one hand to pan around.</li>
+            <li>Draw a clockwise circle with your index finger to zoom in.</li>
+            <li>Draw a counter-clockwise circle with your index finger to zoom out.</li>
+            <li>&nbsp;</li>
+
+            <h2>Streetview</h2>
+
+            <li>Palm up to enter streetview whereever your focus is.</li>
+            <li>Swipe up and down to go forward and backwards, respectively.</li>
+            <li>Palm down with both hands to exit streetview.</li>
+            <li>&nbsp;</li>
+
+            <h2>Points of Interests</h2>
+
+            <li>Palm down with both hands to show all points of interest near your focus.</li>
+            <li>&nbsp;</li>
             
-        <div id="interests">
-            <div id="results">
-                <h2>Results</h2>
-                <ul id="places"></ul>
-                <button id="more">More results</button>
-            </div>
-            <form method="get" action="http://www.google.com/search">
-                 <input type="text" name="q" size="30" x-webkit-speech />
-                 <input type="submit" value="Search" />
-            </form>
-            <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
-            <ul>
-                <h2>Basic Movement</h2>
-                <li>Grab the map with one hand to pan around.</li>
-                <li>Draw a clockwise circle with your index finger to zoom in.</li>
-                <li>Draw a counter-clockwise circle with your index finger to zoom out.</li>
-                <li>&nbsp;</li>
+            <h2>Directions</h2>
 
-                <h2>Streetview</h2>
+            <li>Tap to place the starting location</li>
+            <li>Tap once more, somewhere else, to place the end location. The shortest path between the two markers should come up.</li>
+            <li>Tap again, as many as you want, to place waypoints between the path.</li>
+            <li>Poke the screen to clear all dropped markers.</li>
+            <li>&nbsp;</li>
 
-                <li>Palm up to enter streetview wherever your focus is.</li>
-                <li>Swipe up and down to go forward and backwards, respectively.</li>
-                <li>Palm down with both hands to exit streetview.</li>
-                <li>&nbsp;</li>
+            <h2>Menu</h2>
+            <li>Clap to bring up the menu.</li>
+            <li>&nbsp;</li>
+          </ul>
 
-                <h2>Points of Interests</h2>
-
-                <li>Palm down with both hands to show all points of interest near your focus.</li>
-                <li>&nbsp;</li>
-                
-                <h2>Directions</h2>
-
-                <li>Tap to place the starting location</li>
-                <li>Tap once more, somewhere else, to place the end location. The shortest path between the two markers should come up.</li>
-                <li>Tap again, as many as you want, to place waypoints between the path.</li>
-                <li>Poke the screen to clear all dropped markers.</li>
-                <li>&nbsp;</li>
-
-                <h2>Menu</h2>
-                <li>Clap to bring up the menu.</li>
-                <li>&nbsp;</li>
-            </ul>
         </div>
     </body>
->>>>>>> cddf5fd46c525f52d65b355c255a2bf0c9e8cded
 </html>
