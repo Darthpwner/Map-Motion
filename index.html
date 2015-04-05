@@ -107,6 +107,7 @@ var SEPARATION_SCALING = 1.25;
 var LEFT_HAND = 0, RIGHT_HAND = 1;
 var X = 0, Y = 1, Z = 2;
 
+var pointsOfInterestOrigins = [];
 
 var lookupClickedLastFrame = 0;
 
@@ -583,6 +584,21 @@ function showNearByPOI(){
   var myLatlng = new google.maps.LatLng(origin.lat() + ((hand.stabilizedPalmPosition[1] - HEIGHT_OFFSET) * scaling), origin.lng() + (hand.stabilizedPalmPosition[0] * scaling));
   */
   var myOrigin = map.getCenter();
+  var origin;
+  var distance;
+  
+  for (var i = 0; i < pointsOfInterestOrigins.length; i++) {
+    origin = pointsOfInterestOrigins[i];
+    distance = google.maps.geometry.spherical.computeDistanceBetween(myOrigin, origin);
+    if (distance < 500) {
+        console.log("Too close.");
+        return;
+    }
+  }
+  
+  pointsOfInterestOrigins.push(myOrigin);
+  
+  
   var request = {
     location: myOrigin,
     radius: 500,
