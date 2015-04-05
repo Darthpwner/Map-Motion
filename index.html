@@ -14,7 +14,6 @@
         padding: 0;
         height: 95%;
       }
-
       h2{
 
         padding-left: 15px;
@@ -79,10 +78,12 @@
 
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
-    <script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script>
-    <script src="https://js.leapmotion.com/leap-plugins-0.1.6.js"></script>
-    <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
+    <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+    <script src="https://js.leapmotion.com/leap-plugins-0.1.10.js"></script>
+    <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>    
+
     <script>
 
 var map;
@@ -121,7 +122,7 @@ function palmPosition(hand) {
 
 function move(frame) {
     
-    var planorama;
+    var panorama;
     
         
     // This is to catch a bug somewhere that causes the StreetView to not be visible
@@ -621,18 +622,7 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
   map.setTilt(45);
-  /*
-  var request = {
-    location: myOrigin,
-    radius: 500,
-    types: ['store']
-  };
 
-  placesList = document.getElementById('places');
-  infowindow = new google.maps.InfoWindow();
-  service = new google.maps.places.PlacesService(map);
-  service.nearbySearch(request, callback);
-  */
   placesList = document.getElementById('places');
   infowindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
@@ -640,7 +630,11 @@ function initialize() {
   directionsDisplay.setMap(map);
   // listen to Leap Motion
   Leap.loop({enableGestures: true}, move);
+
+
 }
+
+
 // ==== utility functions =====
 /** Returns the truth that a Leap Motion API Hand object is currently in a gripped or "grabbed" state.
 */
@@ -675,6 +669,8 @@ function isClockwise(frame, gesture) {
     if (dotProduct  >  0) clockwise = true;
     return clockwise;
 }
+
+
 
 setTimeout(initialize, 1500 );
 google.maps.event.addDomListener(window, 'load');
