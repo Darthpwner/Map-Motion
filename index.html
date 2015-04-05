@@ -499,9 +499,7 @@ function move(frame) {
           }
            // console.log("Clearing lastHand");
         }
-    }
-    
-    else if (streetView === true && ayMenu === false) {
+    }else if (streetView === true && ayMenu === false) {
         // Two palms down to exit StreetView and return to map.
         if (frame.hands.length === 2 && streetView === true) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
@@ -524,6 +522,8 @@ function move(frame) {
 menuOpen(frame);
   
 }
+
+
 var handMarkers = [];
 var HEIGHT_OFFSET = 150;
 var BASE_MARKER_SIZE_GRIPPED = 350000, BASE_MARKER_SIZE_UNGRIPPED = 500000;
@@ -981,6 +981,13 @@ function initialize() {
     map.fitBounds(bounds);
   });
 
+  // Bias the SearchBox results towards places that are within the bounds of the
+  // current map's viewport.
+  google.maps.event.addListener(map, 'bounds_changed', function() {
+    var bounds = map.getBounds();
+    searchBox.setBounds(bounds);
+  });
+
   placesList = document.getElementById('places');
   infowindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
@@ -1047,7 +1054,7 @@ google.maps.event.addDomListener(window, 'load');
         </div> 
 
 
-        <input id="pac-input" class="controls" type="text" placeholder="Make a fist with your left hand to Voice Search..."/>
+        <input id="pac-input" class="controls" type="text" placeholder="Text Serach..."/>
         <div id="map-canvas"></div>
             <a id="help" target="_blank" href="help.html"><img id="helpimage" style="width:60px;"src="help.png" /></a>
             <ul>
