@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400);
 @font-face {
 	font-weight: normal;
 	font-style: normal;
@@ -10,80 +10,61 @@
 		url('../fonts/codropsicons/codropsicons.svg#codropsicons') format('svg');
 }
 
+*, *:after, *:before { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+.clearfix:before, .clearfix:after { content: ''; display: table; }
+.clearfix:after { clear: both; }
+
 body {
-	background: #444;
-	color: #48a770;
-	font-weight: 300;
-	font-family: 'Lato', Calibri, Arial, sans-serif;
+	background: #fff;
+	color: #8a8c7e;
+	font-size: 100%;
+	line-height: 1.25;
+	font-family: 'Lato', 'Avenir Next', Arial, sans-serif;
 }
 
 a {
+	color: #99cc33;
 	text-decoration: none;
-	color: #48a770;
 	outline: none;
 }
 
 a:hover, a:focus {
-	color: #2c774b;
-	outline: none;
-}
-
-/* Clearfix hack by Nicolas Gallagher: http://nicolasgallagher.com/micro-clearfix-hack/ */
-.clearfix:before,
-.clearfix:after {
-	display: table;
-	content: " ";
-}
-
-.clearfix:after {
-	clear: both;
-}
-
-.codrops-header,
-.codrops-top {
-	font-family: 'Lato', Arial, sans-serif;
+	color: #373e18;
 }
 
 .codrops-header {
-	margin: 0 auto 3em;
-	padding: 3em;
+	margin: 0 auto;
+	padding: 2em 0 0;
 	text-align: center;
 }
 
 .codrops-header h1 {
 	margin: 0;
 	font-weight: 300;
-	font-size: 2.625em;
-	line-height: 1.3;
+	font-size: 2.5em;
 }
 
-.codrops-header span {
+.codrops-header h1 span {
 	display: block;
 	padding: 0 0 0.6em 0.1em;
-	font-size: 60%;
-	color: #aca89a;
+	font-size: 0.6em;
+	opacity: 0.7;
 }
 
 /* To Navigation Style */
 .codrops-top {
 	width: 100%;
 	text-transform: uppercase;
+	font-weight: 600;
 	font-size: 0.69em;
 	line-height: 2.2;
-	font-weight: 400;
-	background: rgba(255,255,255,0.3);
+	background: #fff;
 }
 
 .codrops-top a {
 	display: inline-block;
 	padding: 0 1em;
 	text-decoration: none;
-	letter-spacing: 0.1em;
-}
-
-.codrops-top a:hover {
-	background: rgba(255,255,255,0.4);
-	color: #333;
 }
 
 .codrops-top span.right {
@@ -115,98 +96,82 @@ a:hover, a:focus {
 	content: "\e004";
 }
 
-.main {
-	max-width: 69em;
-	margin: 0 auto;
+.codrops-demos {
+	margin: 30px auto 0;
+	padding: 30px 0;
 }
 
-.column {
-	float: left;
-	width: 50%;
-	padding: 0 2em;
-	min-height: 300px;
-	position: relative;
-	text-align: right;
-}
-
-.column:nth-child(2) {
-	box-shadow: -1px 0 0 rgba(0,0,0,0.1);
-	text-align: left;
-}
-
-.column p {
-	font-weight: 300;
-	font-size: 2em;
-	padding: 0 0 0.5em;
-	margin: 0;
-	line-height: 1.5;
-}
-
-button {
-	border: none;
-	padding: 0.6em 1.2em;
-	background: #388a5a;
-	color: #fff;
-	font-family: 'Lato', Calibri, Arial, sans-serif;
-	font-size: 1em;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	cursor: pointer;
+.codrops-demos a,
+section button {
 	display: inline-block;
-	margin: 3px 2px;
+	background: #a9a9a9;
+	color: #fff;
+	font-weight: 400;
+	padding: 10px 20px;
+	margin: 5px;
+	text-transform: uppercase;
 	border-radius: 2px;
+	letter-spacing: 1px;
 }
 
-button:hover {
-	background: #2c774b;
+.codrops-demos a:hover,
+.codrops-demos a:active,
+.codrops-demos a.current-demo {
+	background: #777;
 }
 
-.info {
+section {
+	padding: 1em 2em 5em;
 	text-align: center;
 	font-size: 1.5em;
-	margin-top: 3em;
-	clear: both;
-	padding: 3em 0;
-	opacity: 0.7;
-	color: #aca89a;
 }
 
-.info a {
-	font-weight: 700;
-	font-size: 0.9em;
+section p {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 20px 0;
 }
 
-@media screen and (max-width: 46.0625em) {
-	.column {
-		width: 100%;
-		min-width: auto;
-		min-height: auto;
-		padding: 2em; 
-		text-align: center;
-	}
+section button {
+	border: none;
+	padding: 15px 30px;
+	outline: none;
+	background: #85b91e;
+}
 
-	.column p {
-		font-size: 1.5em;
-	}
+.related > a {
+	border: 1px solid #99cc33;
+	display: inline-block;
+	text-align: center;
+	margin: 20px 10px;
+	padding: 25px;
+	color: #99cc33;
+	opacity: 0.8;
+	-webkit-transition: color 0.3s, border-color 0.3s;
+	transition: color 0.3s, border-color 0.3s;
+	-webkit-backface-visibility: hidden;
+}
 
-	.column:nth-child(2) {
-		text-align: center;
-		box-shadow: 0 -1px 0 rgba(0,0,0,0.1);
-	}
+.related a:hover {
+	border-color: #82b222;
+	color: #82b222;
+}
+
+.related a img {
+	max-width: 100%;
+}
+
+.related a h3 {
+	margin: 0;
+	padding: 0.5em 0 0.3em;
+	max-width: 300px;
+	text-align: left;
+	font-size: 65%;
+	font-weight: 400;
 }
 
 @media screen and (max-width: 25em) {
-
-	.codrops-header {
-		font-size: 80%;
-	}
-
-	.codrops-top {
-		font-size: 120%;
-	}
-
 	.codrops-icon span {
 		display: none;
 	}
-
 }

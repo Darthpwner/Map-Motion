@@ -4,15 +4,82 @@
     <title>Map Motion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
 
     <style>
       html, body, #map-canvas {
         margin: 0;
         font-family: 'Open Sans', sans-serif;
         padding: 0;
-        height: 95%;
+        height: 100%;
+      }
+      #helpimage{
+
+        opacity:0.4;
+        transition: opacity .25s ease-in-out;
+       -moz-transition: opacity .25s ease-in-out;
+       -webkit-transition: opacity .25s ease-in-out;
+      }
+      #helpimage:hover{
+        opacity: 1;
+      }
+      #help{
+        display: none;
+        position: absolute;
+          top: 15px;
+        right: 15px;
+        cursor: pointer;
+      }
+      footer{
+        position: absolute;
+        bottom: 0px;
+        right: 15px;
+        padding-bottom: 1em;
+        text-align: right;
+        color: #727378;
+        font-size: 1.1em;
+      }
+      h1{
+        font-size: 50px;
+      }
+
+      #map-canvas{
+        display: none;
+
+      }
+
+      ul{
+        width: ;
+        display: none;
+      }
+
+      #gmicon{
+        height:250px;
+        visibility: hidden;
+      }
+
+      p{
+
+        padding-bottom:50px;
+      }
+
+      #continue{
+        font-size:30px;
+        visibility: hidden;
+      }
+
+      #plusicon{
+        padding-left: 50px;
+        padding-bottom: 60px;
+        padding-right: 50px;
+        visibility: hidden;
+      }
+
+      #lmicon{
+        height: 250px;
+        visibility: hidden;
       }
 
       h2{
@@ -70,7 +137,7 @@
         bottom: 0;
         left: 0;
         margin: auto;
-        margin-top: 8%;
+        margin-top: 12%;
         width: 700px;
         height: 400px;
         background-color: white;
@@ -82,14 +149,14 @@
       
       #opac{    
         position: absolute;
-        top: -10px;
+        top: 0;
         right: 0;
         bottom: 0;
         left: 0;
         border-style: solid;
         border-width: 2px;
         background-color: black;
-        height: 86.5%;
+        height: 100%;
         z-index: 1;
         opacity: 0.75;
         visibility: hidden;
@@ -108,6 +175,13 @@
         height: 100px;
         z-index: 3; 
       }
+      
+       @media screen and (max-width:599px) {
+         .splash_img {
+           display: block;
+           margin: 0 auto;
+         }
+       }
     </style>
 
  		<script type="text/javascript" src="http://www.google.com/jsapi?"></script>
@@ -116,11 +190,15 @@
 		</script>
 	</head>
 
-		<div id="container" style="width: 1370px; height: auto;">
+		<div id="container" style="width: 100%; height: auto; text-align: center">
 			<div style="background-color: white; width: auto; height: 0px; float: top; background: linear-gradient(black, ‪#‎2D2B2B‬)">
 				<span style="font-size: 30px; color: ‪black ;margin-left: 0px; margin-top: 0px; margin-bottom: 0px;"></span>
-                <div style="text-align: center; padding-top: 50px;">
-                    <img src="https://github.com/Darthpwner/Map-Motion/blob/gh-pages/Map-Motion-Logo.png?raw=true"/>
+                <div style="text-align: center; padding-top: 25px;">
+                    <h1>Map Motion</h1>
+                    <h2>Leap Motion meets Google Maps. In the most feature-rich way possible.</h2>
+
+                    <p><img class="splash_img" id="gmicon" src="googlemapsicon.png" style="width: 20%; height: auto"/><img class="splash_img" id="plusicon" src="plus.png" style="width: 10%; height: auto"/><img class="splash_img" id="lmicon" src="leapmotion.jpg" style="width: 40%; height: auto"/></p>
+                    <button class="pure-button pure-button-primary" onclick="showApp()"  id="continue">Continue</button>
                 </div>
             </div>
         </div>
@@ -129,11 +207,23 @@
 
     <!--key=AIzaSyCrWGtAkWaNG14yjjbrhfLruCxWC7EvyVQ-->
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
-    <script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script>
-    <script src="https://js.leapmotion.com/leap-plugins-0.1.6.js"></script>
-    <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/velocity/1.2.2/velocity.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
+    <script src="https://js.leapmotion.com/leap-0.6.4.js"></script>
+    <script src="https://js.leapmotion.com/leap-plugins-0.1.10.js"></script>
+    <script src="https://js.leapmotion.com/leap.rigged-hand-0.1.4.min.js"></script>    
+
     <script>
+//alert("sd");
+//$('#gmicon').delay(800).fadeIn(400);
+ // $('#plusicon').delay(1200).fadeIn(400);
+  //$('#lmicon').delay(1400).fadeIn(400);
+
+$('#gmicon').css('visibility','visible').hide().delay(800).fadeIn('slow');
+$('#plusicon').css('visibility','visible').hide().delay(1600).fadeIn('slow');
+$('#lmicon').css('visibility','visible').hide().delay(2400).fadeIn('slow');
+$('#continue').css('visibility','visible').hide().delay(3000).fadeIn('slow');
 
 var map;
 var placesList;
@@ -206,14 +296,14 @@ function move(frame) {
         // Get points of interest by pointing both palms downward while viewing the map (not StreetView)
         if (frame.hands.length === 2 && frame.id > lookupClickedLastFrame + 50) {
             if (palmPosition(frame.hands[0]) === 'down' && palmPosition(frame.hands[1]) === 'down') {
-                document.getElementById("lookup").click();
+                showNearByPOI();
                 lookupClickedLastFrame = frame.id;
                 return;
             }
         }        
     
         // Palm up to activate StreetView.  Two palms down to go back to map.
-        if (frame.hands.length == 1 && streetView === false) {
+        if ((frame.hands.length === 1) && (streetView === false) && (isGripped(frame.hands[0]) === false)) {         
             if (palmPosition(frame.hands[0]) == "up") {
                 var hand = frame.hands[0];
                 var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
@@ -376,7 +466,7 @@ function menuOpen(frame){
       var tip = frame.hands[0].pointables[0].tipPosition[0];
 
       console.log(tip);
-      if(isGripped(frame.hands[0]) && tip < -105){
+      if(isGripped(frame.hands[0]) && tip < -90){
           document.getElementById("opac").style.visibility = 'hidden';ayMenu = false
           document.getElementById("popUpDiv").style.visibility = 'hidden';
         }
@@ -645,6 +735,15 @@ function createMarkers(places) {
   map.fitBounds(bounds);
 }
 
+function showApp(){
+  $('#container').fadeOut('fast');
+  $('#map-canvas').fadeIn('fast');
+  $('ul').fadeIn('fast');
+  $('#help').fadeIn('fast');
+  setTimeout(initialize, 100 );
+
+}
+
 function showNearByPOI(){
   /*
   var scaling = (4.0 / Math.pow(2, map.getZoom()-1));
@@ -706,7 +805,7 @@ function initialize() {
   splashScreen.style.display = 'none';
   
   var interests =  document.getElementById('interests');
-  interests.style.display = 'initial';
+  //interests.style.display = 'initial';
 
   directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
   var myOrigin = new google.maps.LatLng(34.0737354, -118.4455506);
@@ -720,18 +819,7 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
   map.setTilt(45);
-  /*
-  var request = {
-    location: myOrigin,
-    radius: 500,
-    types: ['store']
-  };
 
-  placesList = document.getElementById('places');
-  infowindow = new google.maps.InfoWindow();
-  service = new google.maps.places.PlacesService(map);
-  service.nearbySearch(request, callback);
-  */
   placesList = document.getElementById('places');
   infowindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
@@ -739,7 +827,11 @@ function initialize() {
   directionsDisplay.setMap(map);
   // listen to Leap Motion
   Leap.loop({enableGestures: true}, move);
+
+
 }
+
+
 // ==== utility functions =====
 /** Returns the truth that a Leap Motion API Hand object is currently in a gripped or "grabbed" state.
 */
@@ -775,8 +867,10 @@ function isClockwise(frame, gesture) {
     return clockwise;
 }
 
-setTimeout(initialize, 1500 );
+
 google.maps.event.addDomListener(window, 'load');
+
+
     </script>
       </div>
       </div> 
@@ -789,18 +883,7 @@ google.maps.event.addDomListener(window, 'load');
         </div> 
 
         <div id="map-canvas"></div>
-            
-        <div id="interests">
-            <div id="results">
-                <h2>Results</h2>
-                <ul id="places"></ul>
-                <button id="more">More results</button>
-            </div>
-            <form method="get" action="http://www.google.com/search">
-                 <input type="text" name="q" size="30" x-webkit-speech />
-                 <input type="submit" value="Search" />
-            </form>
-            <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
+            <a id="help" target="_blank" href="help.html"><img id="helpimage" style="width:60px;"src="help.png" /></a>
             <ul>
                 <h2>Basic Movement</h2>
                 <li>Grab the map with one hand to pan around.</li>
@@ -832,6 +915,21 @@ google.maps.event.addDomListener(window, 'load');
                 <li>Clap to bring up the menu.</li>
                 <li>&nbsp;</li>
             </ul>
+        <div id="interests">
+            <div id="results">
+                <h2>Results</h2>
+                <ul id="places"></ul>
+                <button id="more">More results</button>
+            </div>
+            <form method="get" action="http://www.google.com/search">
+                 <input type="text" name="q" size="30" x-webkit-speech />
+                 <input type="submit" value="Search" />
+            </form>
+            <button id="lookup" onclick="showNearByPOI()">Points of Interests</button>
+            
         </div>
     </body>
+    <footer>
+      Map Motion © 2015
+    </footer>
 </html>

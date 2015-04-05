@@ -1,2 +1,2 @@
 # MapMotion
-https://darthpwner.github.io/Map-Motion/
+http://darthpwner.github.io/Map-Motion/
