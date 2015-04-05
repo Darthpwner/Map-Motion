@@ -15,6 +15,29 @@
         padding: 0;
         height: 100%;
       }
+      .controls {
+        margin-top: 16px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #pac-input {
+        display:none;
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 400px;
+      }
+
       #helpimage{
 
         opacity:0.4;
@@ -570,13 +593,14 @@ function switchMode(frame, swipeGesture){
       }                  
   }
   if(swipeDirection=="right"){
-        map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-  }else if(swipeDirection=="left"){
       map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+  }else if(swipeDirection=="left"){
+      map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
   }else if(swipeDirection=="up"){
       map.setMapTypeId(google.maps.MapTypeId.HYBRID);
   }else if(swipeDirection=="down"){
       map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+
   }
 }
 
@@ -740,7 +764,9 @@ function showApp(){
   $('#map-canvas').fadeIn('fast');
   $('ul').fadeIn('fast');
   $('#help').fadeIn('fast');
-  setTimeout(initialize, 100 );
+  $('#pac-input').fadeIn('fast');
+  
+  setTimeout(initialize, 100);
 
 }
 
@@ -819,7 +845,11 @@ function initialize() {
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),mapOptions);
   map.setTilt(45);
+  
+  var input = (document.getElementById('pac-input'));
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
+  var searchBox = new google.maps.places.SearchBox((input));
   placesList = document.getElementById('places');
   infowindow = new google.maps.InfoWindow();
   service = new google.maps.places.PlacesService(map);
@@ -827,7 +857,6 @@ function initialize() {
   directionsDisplay.setMap(map);
   // listen to Leap Motion
   Leap.loop({enableGestures: true}, move);
-
 
 }
 
@@ -875,6 +904,7 @@ google.maps.event.addDomListener(window, 'load');
       </div>
       </div> 
   	<body>
+<<<<<<< Updated upstream
         <div id="opac"></div>
           <div id="popUpDiv">
             <div id="menu">
@@ -882,6 +912,9 @@ google.maps.event.addDomListener(window, 'load');
           </div>
         </div> 
 
+=======
+        <input id="pac-input" class="controls" type="text" placeholder="Make a fist with your left hand to Voice Search..."/>
+>>>>>>> Stashed changes
         <div id="map-canvas"></div>
             <a id="help" target="_blank" href="help.html"><img id="helpimage" style="width:60px;"src="help.png" /></a>
             <ul>
