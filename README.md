@@ -1,4 +1,6 @@
 # MapMotion
 Leap Motion & Google Maps working together to make something extraordinary.
 
-http://mapmotion.me
+Official Website: http://mapmotion.me
+
+Video Link: http://youtu.be/c1zmHMSd4Y4
